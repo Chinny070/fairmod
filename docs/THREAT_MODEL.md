@@ -1,0 +1,29 @@
+# Threat Model (Stage 0)
+
+Format: Attack / Mechanism that prevents it (design-level; contract-enforced, not frontend-enforced) / Stage that implements enforcement / Stage that tests it.
+
+| # | Attack | Prevention design | Enforced in | Tested in |
+|---|---|---|---|---|
+| 1 | Gain moderator/admin authority | Role maps keyed by `(community_id, address)`, written only by the owner-authorized `add_moderator` method; every privileged method checks `gl.message.sender_address` against the map, never a caller-supplied role field | Stage 1 | Stage 1 direct tests |
+| 2 | Alter another community's constitution | `activate_constitution` requires sender == that `community_id`'s owner; constitution storage keyed by `community_id` so no cross-community write path exists | Stage 1 | Stage 1 |
+| 3 | Change rules after a case begins | Case stores the bound `(community_id, version)` at creation; adjudication always reads that pinned version, never "current active" | Stage 1 | Stage 1 |
+| 4 | Replace content after freeze | Content/context fields become read-only once case leaves OPEN — no write method accepts case_id + content for a non-OPEN case | Stage 1 | Stage 1 |
+| 5 | Replace evidence after freeze | Evidence rows immutable once case state != OPEN; `submit_evidence` guard checks case state first | Stage 1 | Stage 1/2 |
+| 6 | Reference another case's evidence | Evidence keyed by compound `(case_id, evidence_id)`; adjudication only reads evidence rows whose case_id matches the case being judged | Stage 1 | Stage 1 |
+| 7 | Inject instructions through a message | Reported content is placed only in the "untrusted reported content" prompt section, structurally separated from the trusted procedure/constitution sections; structured-output validation rejects free-form control | Stage 3 | Stage 3 (prompt-injection test set) |
+| 8 | Inject instructions through a webpage | Web-rendered text is treated as untrusted evidence text, never concatenated into the trusted procedure section; same validation as #7 | Stage 2/3 | Stage 2/3 |
+| 9 | Inject instructions through document text | DOCUMENT is UNSUPPORTED per `EVIDENCE_CAPABILITY_MATRIX.md` — attack surface does not exist until/unless that changes, at which point rule applies identically to #8 | N/A (blocked) | N/A |
+| 10 | Inject instructions through text visible inside an image | IMAGE is BLOCKED per capability matrix — same reasoning as #9 | N/A (blocked) | N/A |
+| 11 | Exploit changing webpages (leader vs validator see different content) | `gl.eq_principle.prompt_comparative` equivalence judgment across independently-fetched content; contract must treat non-equivalence as consensus failure -> `NEEDS_REVIEW`, not silent leader-trust | Stage 2/2A | Stage 2A hosted proof |
+| 12 | Cause validators to inspect materially different evidence and still finalize | Same as #11 — the state machine explicitly forbids DECIDED unless the consensus callback itself succeeded (GenVM would not deliver a value if validators can't reach equivalence) | Stage 2/3 | Stage 2A/7 |
+| 13 | Replay a transaction/action | Case/evidence/challenge IDs are protocol-assigned; every transition guard checks current state, so identical calldata sent twice is a no-op the second time | Stage 1 | Stage 1 |
+| 14 | Adjudicate twice | ADJUDICATING -> DECIDED is a one-way, state-guarded transition; a second consensus callback for an already-DECIDED case is rejected | Stage 1/3 | Stage 1/3 |
+| 15 | Challenge twice | Challenge storage is one-per-case (bounded per spec); `file_challenge` rejects if a challenge already exists for that case | Stage 4 | Stage 4 |
+| 16 | Bypass challenge deadlines | Deadline computed from the deterministic transaction timestamp at DECIDED time, stored, and checked on every `file_challenge` call — not client-supplied | Stage 4 | Stage 4 |
+| 17 | Permanently freeze a case (griefing/deadlock) | Every non-terminal state has a deterministic timeout exit (see STATE_MACHINE.md liveness section) | Stage 1/4 | Stage 4 |
+| 18 | Corrupt precedent/history | Finalized cases are immutable (no write method accepts a FINAL case_id); Precedent Explorer only reads finalized state | Stage 1/5 | Stage 5 |
+| 19 | Make UI state look final when consensus is not final | Frontend lifecycle explicitly models `pending/consensus` as distinct from `finalized`; a tx hash alone never flips the UI's "final" badge — it polls actual contract state | Stage 6 | Stage 6/7 manual verification |
+| 20 | Exploit stale contract/network configuration | One canonical typed chain/address config file the frontend imports everywhere; wallet flow detects chain id and blocks writes on mismatch rather than silently submitting to the wrong network | Stage 6 | Stage 6/7 |
+
+## Explicitly out of scope for Stage 0
+No code implementing any of the above mitigations exists yet — this table is the design contract that Stage 1–7 implementation and tests must satisfy, and Stage 8's hostile audit re-attacks every row above against the actual shipped code.
