@@ -17,6 +17,12 @@ from dataclasses import dataclass
 
 from genlayer import *
 
+# Canonical logical Rule ID format: protocol identifier, not free-form display
+# text. Reject anything outside A-Z, 0-9, '_'; reject empty. Do NOT normalize
+# (lowercase/strip) malformed input — reject it outright, so "harassment"
+# and "HARASSMENT" are never silently treated as the same identifier.
+_RULE_ID_ALPHABET = frozenset('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_')
+
 
 # ---------------------------------------------------------------------------
 # Resource bounds (Stage 1 requirement #12: every bound must be justified)
@@ -106,6 +112,39 @@ def _bounded_str(value: str, field_name: str, max_len: int, *, allow_empty: bool
 	return value
 
 
+def _constitution_key(community_id: str, version) -> str:
+	"""Composite string key for the top-level rules/rule_order maps."""
+	return f'{community_id}::{int(version)}'
+
+
+def _bounded_exceptions_joined(exceptions: list) -> str:
+	_require(len(exceptions) <= MAX_RULE_EXCEPTIONS, f'too many exceptions (max {MAX_RULE_EXCEPTIONS})')
+	checked = []
+	for exc in exceptions:
+		exc = str(exc)
+		_require('\n' not in exc, 'exception text must not contain a newline')
+		checked.append(_bounded_str(exc, 'exception', MAX_RULE_EXCEPTION_LEN))
+	return '\n'.join(checked)
+
+
+def _canonical_rule_id(value: str) -> str:
+	"""
+	Validate a logical Rule ID against the canonical protocol format
+	(A-Z, 0-9, '_'; non-empty; bounded). Malformed input is REJECTED, never
+	silently normalized — " harassment ", "Harassment", "harassment",
+	"../../HARASSMENT" and "HARASSMENT!" must all revert, not be coerced
+	into a valid form.
+	"""
+	_require(isinstance(value, str), 'rule_id must be a string')
+	_require(len(value) > 0, 'rule_id must not be empty')
+	_require(len(value) <= MAX_RULE_ID_LEN, f'rule_id exceeds max length {MAX_RULE_ID_LEN}')
+	_require(
+		all(ch in _RULE_ID_ALPHABET for ch in value),
+		'rule_id must match the canonical format: only A-Z, 0-9, and _ are allowed',
+	)
+	return value
+
+
 @allow_storage
 @dataclass
 class Community:
@@ -127,7 +166,16 @@ class RuleRevision:
 	title: str
 	definition: str
 	category: str
-	exceptions: DynArray[str]
+	# Storage note (see docs/STAGE_1_VERIFICATION.md, "storage-container-as-
+	# dataclass-field" finding): a DynArray/TreeMap field CANNOT be nested
+	# inside a plain @allow_storage dataclass that is itself stored as a
+	# value inside another TreeMap — the storage-descriptor machinery only
+	# supports fresh container allocation for fields declared directly on
+	# the top-level gl.Contract class. Exceptions are therefore stored as a
+	# single newline-joined bounded string instead of DynArray[str];
+	# individual exception text is rejected outright if it contains a
+	# newline (see _bounded_exceptions_joined), never silently stripped.
+	exceptions_joined: str
 	context_required: bool
 	evidence_policy: str
 
@@ -141,8 +189,10 @@ class Constitution:
 	created_at: str
 	activated_at: str
 	retired_at: str
-	rules: TreeMap[str, RuleRevision]
-	rule_order: DynArray[str]  # deterministic enumeration order for rule_ids
+	# rules/rule_order deliberately NOT stored here — see the same storage
+	# note above. They live in the contract's own top-level
+	# `constitution_rules`/`constitution_rule_order` maps, keyed by
+	# `_constitution_key(community_id, version)`.
 
 
 @allow_storage
@@ -195,6 +245,11 @@ class FairMod(gl.Contract):
 
 	# constitutions[community_id][version] = Constitution
 	constitutions: TreeMap[str, TreeMap[u256, Constitution]]
+
+	# rules/rule_order for a constitution, keyed by _constitution_key(community_id, version)
+	# — kept top-level rather than nested inside Constitution; see RuleRevision's docstring.
+	constitution_rules: TreeMap[str, TreeMap[str, RuleRevision]]
+	constitution_rule_order: TreeMap[str, DynArray[str]]
 
 	# cases[case_id] = Case  (case_id globally unique, encodes community_id)
 	cases: TreeMap[str, Case]
@@ -262,8 +317,8 @@ class FairMod(gl.Contract):
 			case_counter=u256(0),
 		)
 		self.community_order.append(community_id)
-		self.roles[community_id] = TreeMap()
-		self.constitutions[community_id] = TreeMap()
+		self.roles.get_or_insert_default(community_id)
+		self.constitutions.get_or_insert_default(community_id)
 		return community_id
 
 	@gl.public.view
@@ -347,9 +402,10 @@ class FairMod(gl.Contract):
 			created_at=now,
 			activated_at='',
 			retired_at='',
-			rules=TreeMap(),
-			rule_order=DynArray(),
 		)
+		key = _constitution_key(community_id, version)
+		self.constitution_rules.get_or_insert_default(key)
+		self.constitution_rule_order.get_or_insert_default(key)
 		return int(version)
 
 	def _get_constitution(self, community_id: str, version: int) -> Constitution:
@@ -379,10 +435,14 @@ class FairMod(gl.Contract):
 		constitution = self._get_constitution(community_id, version)
 		_require(constitution.status == CONSTITUTION_DRAFT, 'rules can only be added while the constitution is DRAFT')
 
-		rule_id = _bounded_str(rule_id, 'rule_id', MAX_RULE_ID_LEN)
-		_require(rule_id not in constitution.rules, f'duplicate rule_id "{rule_id}" within this constitution version')
+		key = _constitution_key(community_id, version)
+		rules = self.constitution_rules[key]
+		rule_order = self.constitution_rule_order[key]
+
+		rule_id = _canonical_rule_id(rule_id)
+		_require(rule_id not in rules, f'duplicate rule_id "{rule_id}" within this constitution version')
 		_require(
-			len(constitution.rule_order) < MAX_RULES_PER_CONSTITUTION,
+			len(rule_order) < MAX_RULES_PER_CONSTITUTION,
 			f'constitution has reached the maximum of {MAX_RULES_PER_CONSTITUTION} rules',
 		)
 
@@ -390,22 +450,18 @@ class FairMod(gl.Contract):
 		definition = _bounded_str(definition, 'definition', MAX_RULE_DEFINITION_LEN)
 		category = _bounded_str(category, 'category', MAX_NAME_LEN, allow_empty=True)
 		evidence_policy = _bounded_str(evidence_policy, 'evidence_policy', MAX_EVIDENCE_POLICY_LEN, allow_empty=True)
+		exceptions_joined = _bounded_exceptions_joined(exceptions)
 
-		_require(len(exceptions) <= MAX_RULE_EXCEPTIONS, f'too many exceptions (max {MAX_RULE_EXCEPTIONS})')
-		bounded_exceptions = DynArray()
-		for exc in exceptions:
-			bounded_exceptions.append(_bounded_str(str(exc), 'exception', MAX_RULE_EXCEPTION_LEN))
-
-		constitution.rules[rule_id] = RuleRevision(
+		rules[rule_id] = RuleRevision(
 			rule_id=rule_id,
 			title=title,
 			definition=definition,
 			category=category,
-			exceptions=bounded_exceptions,
+			exceptions_joined=exceptions_joined,
 			context_required=bool(context_required),
 			evidence_policy=evidence_policy,
 		)
-		constitution.rule_order.append(rule_id)
+		rule_order.append(rule_id)
 
 	@gl.public.write
 	def activate_constitution(self, community_id: str, version: int) -> None:
@@ -415,7 +471,8 @@ class FairMod(gl.Contract):
 
 		constitution = self._get_constitution(community_id, version)
 		_require(constitution.status == CONSTITUTION_DRAFT, 'only a DRAFT constitution can be activated')
-		_require(len(constitution.rule_order) > 0, 'cannot activate a constitution with zero rules')
+		key = _constitution_key(community_id, version)
+		_require(len(self.constitution_rule_order[key]) > 0, 'cannot activate a constitution with zero rules')
 
 		now = _now()
 
@@ -436,14 +493,16 @@ class FairMod(gl.Contract):
 	@gl.public.view
 	def get_constitution(self, community_id: str, version: int) -> dict:
 		constitution = self._get_constitution(community_id, version)
+		key = _constitution_key(community_id, version)
+		rule_map = self.constitution_rules[key]
 		rules = {}
-		for rule_id in constitution.rule_order:
-			r = constitution.rules[rule_id]
+		for rule_id in self.constitution_rule_order[key]:
+			r = rule_map[rule_id]
 			rules[rule_id] = {
 				'title': r.title,
 				'definition': r.definition,
 				'category': r.category,
-				'exceptions': list(r.exceptions),
+				'exceptions': r.exceptions_joined.split('\n') if r.exceptions_joined else [],
 				'context_required': r.context_required,
 				'evidence_policy': r.evidence_policy,
 			}
@@ -494,9 +553,9 @@ class FairMod(gl.Contract):
 			evidence_count=u256(0),
 			context_count=u256(0),
 		)
-		self.contexts[case_id] = DynArray()
-		self.evidence[case_id] = TreeMap()
-		self.evidence_order[case_id] = DynArray()
+		self.contexts.get_or_insert_default(case_id)
+		self.evidence.get_or_insert_default(case_id)
+		self.evidence_order.get_or_insert_default(case_id)
 		return case_id
 
 	@gl.public.view

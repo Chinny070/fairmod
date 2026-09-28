@@ -4,3 +4,5 @@ __pycache__/
 gltest.config.yaml
 .env
 artifacts/
+.pytest_cache/
+artifacts/
