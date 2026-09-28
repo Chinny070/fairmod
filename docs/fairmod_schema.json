@@ -1,0 +1,321 @@
+{
+  "ctor": {
+    "params": [],
+    "kwparams": {}
+  },
+  "methods": {
+    "activate_constitution": {
+      "params": [
+        [
+          "community_id",
+          "string"
+        ],
+        [
+          "version",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": false
+    },
+    "add_context": {
+      "params": [
+        [
+          "case_id",
+          "string"
+        ],
+        [
+          "kind",
+          "string"
+        ],
+        [
+          "content",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": false
+    },
+    "add_rule": {
+      "params": [
+        [
+          "community_id",
+          "string"
+        ],
+        [
+          "version",
+          "int"
+        ],
+        [
+          "rule_id",
+          "string"
+        ],
+        [
+          "title",
+          "string"
+        ],
+        [
+          "definition",
+          "string"
+        ],
+        [
+          "category",
+          "string"
+        ],
+        [
+          "exceptions",
+          "array"
+        ],
+        [
+          "context_required",
+          "bool"
+        ],
+        [
+          "evidence_policy",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": false
+    },
+    "create_case": {
+      "params": [
+        [
+          "community_id",
+          "string"
+        ],
+        [
+          "content",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "string",
+      "payable": false
+    },
+    "create_community": {
+      "params": [
+        [
+          "name",
+          "string"
+        ],
+        [
+          "metadata",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "string",
+      "payable": false
+    },
+    "create_constitution_draft": {
+      "params": [
+        [
+          "community_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "int",
+      "payable": false
+    },
+    "freeze_case": {
+      "params": [
+        [
+          "case_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": false
+    },
+    "get_active_constitution_version": {
+      "params": [
+        [
+          "community_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "int"
+    },
+    "get_case": {
+      "params": [
+        [
+          "case_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "dict"
+    },
+    "get_case_state": {
+      "params": [
+        [
+          "case_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "string"
+    },
+    "get_community": {
+      "params": [
+        [
+          "community_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "dict"
+    },
+    "get_constitution": {
+      "params": [
+        [
+          "community_id",
+          "string"
+        ],
+        [
+          "version",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "dict"
+    },
+    "get_context": {
+      "params": [
+        [
+          "case_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "array"
+    },
+    "get_evidence": {
+      "params": [
+        [
+          "case_id",
+          "string"
+        ],
+        [
+          "evidence_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "dict"
+    },
+    "get_role": {
+      "params": [
+        [
+          "community_id",
+          "string"
+        ],
+        [
+          "target",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "string"
+    },
+    "grant_role": {
+      "params": [
+        [
+          "community_id",
+          "string"
+        ],
+        [
+          "target",
+          "string"
+        ],
+        [
+          "role",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": false
+    },
+    "list_communities": {
+      "params": [],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "array"
+    },
+    "list_evidence": {
+      "params": [
+        [
+          "case_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "array"
+    },
+    "revoke_role": {
+      "params": [
+        [
+          "community_id",
+          "string"
+        ],
+        [
+          "target",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": false
+    },
+    "submit_evidence": {
+      "params": [
+        [
+          "case_id",
+          "string"
+        ],
+        [
+          "evidence_type",
+          "string"
+        ],
+        [
+          "reference",
+          "string"
+        ],
+        [
+          "source_category",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "string",
+      "payable": false
+    }
+  }
+}
