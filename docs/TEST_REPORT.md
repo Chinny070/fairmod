@@ -1,6 +1,9 @@
 # Test Strategy (Stage 0 plan; Stage 1/2 actually executed — see below)
 
-## Actual results (Stage 1 + Stage 2)
+## Actual results (Stage 1 + Stage 2 + Stage 3)
+121/121 tests passing (93 Stage 1/2 regression + 28 Stage 3 semantic adjudication, mocked LLM via `gltest.direct`). See docs/STAGE_3_VERIFICATION.md. Hosted StudioNet proof remains blocked network-side by genlayerlabs/genvm-manager#50 — not attempted.
+
+## Earlier results (Stage 1 + Stage 2)
 93/93 tests passing via `gltest.direct` (pure in-memory, no Docker/localnet — see docs/STAGE_1_VERIFICATION.md for why the localnet path is environment-blocked and how `gltest.direct` was found and used instead). 49 Stage 1 (community/roles/constitutions/cases/context/evidence-records/freeze/state-machine/timestamps) + 44 Stage 2 (URL validation/DOCUMENT routing/fingerprints/acquisition state transitions/prompt-injection/visual evidence/replay/retry/authority). Command: `python -m pytest test/ -q`. Full detail in docs/STAGE_1_VERIFICATION.md and docs/STAGE_2_VERIFICATION.md — this file's original plan below is retained for what Stage 7 hosted proof still owes.
 
 ---

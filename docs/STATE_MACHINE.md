@@ -1,4 +1,8 @@
-# Case State Machine (Stage 0 design)
+# Case State Machine (Stage 0 design; DECIDED/NEEDS_REVIEW IMPLEMENTED in Stage 3)
+
+## Stage 3 update
+`EVIDENCE_FROZEN -> DECIDED` (verdict ALLOWED/FLAGGED) and `EVIDENCE_FROZEN -> NEEDS_REVIEW` are now implemented via `adjudicate_case`, exactly matching this design's original transition table. Both are terminal-for-now: no method reaches `CHALLENGE_WINDOW`/`CHALLENGED`/`CHALLENGE_DECIDED`/`FINAL` yet (Stage 4). Replay-safe: adjudicating an already-`DECIDED`/`NEEDS_REVIEW` case is a no-op returning the existing status. See [docs/STAGE_3_VERIFICATION.md](STAGE_3_VERIFICATION.md).
+
 
 ## States
 `OPEN`, `EVIDENCE_FROZEN`, `ADJUDICATING`, `DECIDED`, `NEEDS_REVIEW`, `CHALLENGE_WINDOW`, `CHALLENGED`, `CHALLENGE_DECIDED`, `FINAL`.
