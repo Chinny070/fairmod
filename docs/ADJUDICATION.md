@@ -15,7 +15,7 @@ Implements Stage 3. Design only here — no prompt code exists yet.
 Reject/route to NEEDS_REVIEW on: invalid enum, non-existent rule/evidence IDs, malformed JSON, internally contradictory output (e.g. `ALLOWED` with `relevant_rule_ids` non-empty and no explanation), oversized rationale.
 
 ## Equivalence strategy
-`gl.eq_principle.prompt_comparative` (LLM-judged, per `EVIDENCE_CAPABILITY_MATRIX.md`) with a principle string requiring agreement on verdict + relied-on rule/evidence IDs, not verbatim rationale text — rationale itself is not equivalence-compared, consistent with "do not strict-compare free-form rationale."
+`gl.eq_principle.prompt_comparative(fn, principle)` (source-verified in `GENVM_API_VERIFICATION.md`) with a principle string requiring agreement on verdict + relied-on rule/evidence IDs, not verbatim rationale text — rationale itself is not equivalence-compared, consistent with "do not strict-compare free-form rationale." Note the confirmed mechanics: each validator re-runs the adjudication closure itself and the judgment compares `leader_answer` vs `validator_answer` against `principle`, so this also satisfies "no single LLM/browser fetch followed by blind acceptance."
 
 ## Prompt-injection tests (Stage 3 deliverable, planned here)
 "ignore previous instructions", fake system-prompt text, fake Rule/Evidence IDs asserted inside evidence text, JSON-escape/breakout attempts, injected text inside rendered web pages. Pass condition: output schema validation rejects/ignores the injected instruction and the case does not receive an unsupported verdict.
