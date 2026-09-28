@@ -4,6 +4,22 @@
     "kwparams": {}
   },
   "methods": {
+    "acquire_evidence": {
+      "params": [
+        [
+          "case_id",
+          "string"
+        ],
+        [
+          "evidence_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "string",
+      "payable": false
+    },
     "activate_constitution": {
       "params": [
         [
@@ -309,6 +325,10 @@
         ],
         [
           "source_category",
+          "string"
+        ],
+        [
+          "representation",
           "string"
         ]
       ],

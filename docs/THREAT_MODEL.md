@@ -25,5 +25,8 @@ Format: Attack / Mechanism that prevents it (design-level; contract-enforced, no
 | 19 | Make UI state look final when consensus is not final | Frontend lifecycle explicitly models `pending/consensus` as distinct from `finalized`; a tx hash alone never flips the UI's "final" badge — it polls actual contract state | Stage 6 | Stage 6/7 manual verification |
 | 20 | Exploit stale contract/network configuration | One canonical typed chain/address config file the frontend imports everywhere; wallet flow detects chain id and blocks writes on mismatch rather than silently submitting to the wrong network | Stage 6 | Stage 6/7 |
 
+## Stage 2 update
+Rows 7-12 (evidence/web-render/injection/independent-acquisition) are now implemented and mock-tested — see [docs/STAGE_2_VERIFICATION.md](STAGE_2_VERIFICATION.md#hostile-self-audit) for the executed hostile self-audit (localhost/private URLs, malformed URLs, oversized pages, prompt injection in text/image, unsupported PDF/DOCX, cross-case/cross-community evidence, malicious acquisition callers, fabricated results, stale-result overwrite). One material finding was found and fixed during this stage: `web.render(mode='text')` exposes no HTTP status, so an error page with non-empty body would have been misclassified ACQUIRED — fixed by switching to `web.get()`. Redirect-based SSRF and real cross-validator divergence handling remain explicitly UNVERIFIED/REQUIRES_HOSTED_PROOF, not silently assumed safe.
+
 ## Explicitly out of scope for Stage 0
 No code implementing any of the above mitigations exists yet — this table is the design contract that Stage 1–7 implementation and tests must satisfy, and Stage 8's hostile audit re-attacks every row above against the actual shipped code.

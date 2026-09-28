@@ -1,4 +1,8 @@
-# Evidence Capability Matrix (Stage 0 — REVISED)
+# Evidence Capability Matrix (Stage 0 — REVISED; Stage 2 implementation notes appended)
+
+## Stage 2 update
+Stage 2 ([docs/STAGE_2_VERIFICATION.md](STAGE_2_VERIFICATION.md)) implemented and mock-tested every row below except raw PDF/DOCX. Two corrections from actual implementation, not just design: (1) the text route uses `gl.nondet.web.get()`, not `web.render(mode='text')` — `render` exposes no HTTP status, which would have misclassified error pages as ACQUIRED (found via hostile self-audit, fixed); (2) `gl.eq_principle.prompt_comparative(...)` called directly (not `.lazy(...)`) is EAGER and returns the resolved value directly, not a `Lazy[T]` — an earlier draft's `.get()` call on it was a bug, not correct usage. All hosted-proof items below remain REQUIRES_HOSTED_PROOF; Stage 2 only reached MOCK-TESTED.
+
 
 ## Source of truth for this revision
 

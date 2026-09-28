@@ -375,11 +375,11 @@ def test_submit_each_evidence_type_record(direct_deploy):
 
 	text_id = contract.submit_evidence(case_id, "TEXT", "some text", "")
 	link_id = contract.submit_evidence(case_id, "WEB_LINK", "https://example.com", "general-web")
-	doc_id = contract.submit_evidence(case_id, "DOCUMENT", "https://example.com/doc.html", "general-web")
+	doc_id = contract.submit_evidence(case_id, "DOCUMENT", "https://example.com/doc.html", "general-web", "HTML_TEXT")
 	img_id = contract.submit_evidence(case_id, "IMAGE", "https://example.com/pic.png", "general-web")
 
 	for eid, expected_type, expected_status in (
-		(text_id, "TEXT", "NOT_APPLICABLE"),
+		(text_id, "TEXT", "ACQUIRED"),
 		(link_id, "WEB_LINK", "PENDING"),
 		(doc_id, "DOCUMENT", "PENDING"),
 		(img_id, "IMAGE", "PENDING"),

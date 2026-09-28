@@ -1,4 +1,8 @@
-# Evidence Model & Web Render Design (Stage 0 — REVISED)
+# Evidence Model & Web Render Design (Stage 0 — REVISED; implemented in Stage 2)
+
+## Stage 2 implementation status
+This design is now implemented in `contracts/fairmod.py` (`submit_evidence`, `acquire_evidence`, `_acquire_text_route`, `_acquire_image_route`) and mock-tested in `test/test_stage2.py` (44 tests). See [docs/STAGE_2_VERIFICATION.md](STAGE_2_VERIFICATION.md) for exact API usage, the equivalence strategy actually used (`prompt_comparative`, not `strict_eq` — pages aren't byte-stable), and what remains REQUIRES_HOSTED_PROOF (real validator-side fetch/render/vision under actual consensus). URL validation is deterministic string-based only — no DNS resolution — documented limitation, not a general SSRF-safe primitive.
+
 
 This doc is the design companion to `EVIDENCE_CAPABILITY_MATRIX.md` (API verification, now source-verified from the embedded GenVM `genlayer.gl` package, lives there — this doc is the data-model/flow design).
 

@@ -56,5 +56,8 @@ The prompt assembled for `exec_prompt`/`eq_principle.prompt_comparative` must be
 ## Frontend information architecture (design system detail in a later stage doc; IA only here)
 Landing -> Communities Explorer -> Community profile -> {Rules Studio, Constitution history, New Case, Moderation history, Precedent Explorer, Transparency, Fairness Mirror, Playground} -> Case File -> {Evidence Locker, Consensus status, Challenge flow, Moderation Receipt}. Every page reads from one canonical typed chain/contract-address config; no page hardcodes an address or duplicates the ABI/schema import.
 
+## Stage 2 update
+Evidence acquisition (`acquire_evidence`) is now implemented per the conceptual flow above, using `gl.nondet.web.get()` (text route — corrected from `web.render` to expose HTTP status) and `gl.nondet.web.render(mode='screenshot')` + `gl.nondet.exec_prompt(images=[...])` (image route), both wrapped in `gl.eq_principle.prompt_comparative`. See [docs/STAGE_2_VERIFICATION.md](STAGE_2_VERIFICATION.md) for full detail, mock-test coverage, and REQUIRES_HOSTED_PROOF items. Still no semantic verdict logic anywhere in the contract.
+
 ## Explicit non-scope for Stage 0
 No contract file, no frontend code, no deployment, no wallet connection, no transaction of any kind was produced or executed in this stage.
