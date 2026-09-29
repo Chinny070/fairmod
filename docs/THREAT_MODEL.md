@@ -1,5 +1,8 @@
 # Threat Model (Stage 0)
 
+## Stage 6 update
+Full adversarial re-audit of every row above against the actual Stage 5 code (see [docs/STAGE_6_ADVERSARIAL_AUDIT.md](STAGE_6_ADVERSARIAL_AUDIT.md)). One real defect found and fixed: `adjudicate_case`/`resolve_challenge`'s structured-output validators accepted a contradictory ALLOWED (or OVERTURN→ALLOWED) verdict carrying non-empty violated-rule citations — closed with a symmetric guard, regression-tested. One narrow, disclosed gap accepted, not fixed: `_validate_https_url`'s private-host blocklist does not catch the bracketed IPv6-loopback literal `[::1]` — this sits inside the already-disclosed "not a general-purpose SSRF-safe fetch primitive" trust boundary (row 8's mechanism), not a new claim being broken. All other rows (1-20) re-verified structurally against the code, not re-derived from trusting this file's own prior claims.
+
 Format: Attack / Mechanism that prevents it (design-level; contract-enforced, not frontend-enforced) / Stage that implements enforcement / Stage that tests it.
 
 | # | Attack | Prevention design | Enforced in | Tested in |

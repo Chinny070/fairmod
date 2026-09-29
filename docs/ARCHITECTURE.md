@@ -56,6 +56,9 @@ The prompt assembled for `exec_prompt`/`eq_principle.prompt_comparative` must be
 ## Frontend information architecture (design system detail in a later stage doc; IA only here)
 Landing -> Communities Explorer -> Community profile -> {Rules Studio, Constitution history, New Case, Moderation history, Precedent Explorer, Transparency, Fairness Mirror, Playground} -> Case File -> {Evidence Locker, Consensus status, Challenge flow, Moderation Receipt}. Every page reads from one canonical typed chain/contract-address config; no page hardcodes an address or duplicates the ABI/schema import.
 
+## Stage 6 update
+Full adversarial audit and hardening pass — no architecture change, feature-frozen. One structured-output validation gap found and fixed (converse rule-ID contradiction in `adjudicate_case`/`resolve_challenge`'s output validators); one narrow web-security gap disclosed and accepted, not fixed (IPv6-bracket-literal loopback form). Public schema, storage layout, and state machine are unchanged (30 methods, same shape). See [docs/STAGE_6_ADVERSARIAL_AUDIT.md](STAGE_6_ADVERSARIAL_AUDIT.md) and [docs/RELEASE_CANDIDATE_VERIFICATION.md](RELEASE_CANDIDATE_VERIFICATION.md).
+
 ## Stage 5 update
 Moderation receipts, community history pagination, precedent discovery, Fairness Mirror, and transparency counters implemented — all read/composed from existing storage, no new indexes. Precedent is informative, never authoritative; Fairness Mirror is informational, never an appeal. See [docs/STAGE_5_VERIFICATION.md](STAGE_5_VERIFICATION.md).
 

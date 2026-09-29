@@ -388,3 +388,18 @@ def test_no_forced_final_or_decided_setter_method_exists():
 	method_names = set(schema["methods"].keys())
 	forbidden = {"set_verdict", "force_decided", "force_final", "set_case_state", "mark_flagged", "mark_allowed"}
 	assert method_names.isdisjoint(forbidden)
+
+def test_allowed_verdict_with_nonempty_rule_ids_rejected(direct_deploy, direct_vm):
+	"""
+	Stage 6 finding: ALLOWED with a non-empty violated_rule_ids list is an
+	internally contradictory candidate (ADJUDICATION.md's own validation
+	contract requires rejecting this), yet _validate_candidate only enforced
+	the FLAGGED-implies-nonempty direction, not ALLOWED-implies-empty. Prior
+	to the Stage 6 fix this asserted status == "DECIDED" with
+	violated_rule_ids == ["HARASSMENT"] persisted alongside verdict ALLOWED.
+	"""
+	contract, cid, case_id = _frozen_case(direct_deploy, "msg")
+	direct_vm.mock_llm(r".*", _llm("ALLOWED", ["HARASSMENT"]))
+	status = contract.adjudicate_case(case_id)
+	assert status == "NEEDS_REVIEW"
+	assert contract.get_case(case_id)["needs_review_reason"] == "MALFORMED_MODEL_OUTPUT"

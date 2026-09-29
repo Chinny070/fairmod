@@ -1,6 +1,9 @@
 # Test Strategy (Stage 0 plan; Stage 1/2 actually executed — see below)
 
-## Actual results (Stage 1 + Stage 2 + Stage 3 + Stage 4 + Stage 5)
+## Actual results (Stage 1 + Stage 2 + Stage 3 + Stage 4 + Stage 5 + Stage 6)
+192/192 tests passing (190 Stage 1-5 regression, unchanged + 2 new Stage 6 regression tests demonstrating and closing the one defect found by the Stage 6 adversarial audit — see [docs/STAGE_6_ADVERSARIAL_AUDIT.md](STAGE_6_ADVERSARIAL_AUDIT.md)). `genvm-lint` clean, schema unchanged (30 methods, byte-identical `fairmod_schema.json`). Hosted StudioNet proof remains blocked by genlayerlabs/genvm-manager#50 (reconfirmed still open, 0 comments, this stage).
+
+## Earlier results (Stage 1 + Stage 2 + Stage 3 + Stage 4 + Stage 5)
 190/190 tests passing (153 Stage 1-4 regression, unchanged + 37 Stage 5 receipts/history/precedent/Fairness Mirror/counters/scale tests). See docs/STAGE_5_VERIFICATION.md. Hosted StudioNet proof remains blocked by genlayerlabs/genvm-manager#50 (confirmed still open, 0 comments, this stage).
 
 ## Earlier results (Stage 1 + Stage 2 + Stage 3 + Stage 4)

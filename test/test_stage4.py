@@ -437,3 +437,20 @@ def test_no_economic_mechanism_introduced():
 	forbidden_substrings = ("deposit", "bond", "stake", "pay", "reward", "penalty")
 	for name in method_names:
 		assert not any(s in name.lower() for s in forbidden_substrings)
+
+
+def test_overturn_to_allowed_with_nonempty_rule_ids_rejected(direct_deploy, direct_vm):
+	"""
+	Stage 6 finding (same defect as adjudicate_case's, mirrored in
+	resolve_challenge): an OVERTURN candidate with final_verdict ALLOWED but
+	a non-empty final_rule_ids list is internally contradictory and must be
+	rejected, not persisted. Prior to the Stage 6 fix this reached FINAL with
+	final_verdict "ALLOWED" and final_rule_ids == ["HARASSMENT"].
+	"""
+	contract, cid, case_id = _decided_case(direct_deploy, direct_vm)
+	contract.file_challenge(case_id, "bad decision")
+	direct_vm.clear_mocks()
+	direct_vm.mock_llm(r".*", _challenge_llm("OVERTURN", "ALLOWED", ["HARASSMENT"]))
+	status = contract.resolve_challenge(case_id)
+	assert status == "FINAL"
+	assert contract.get_case(case_id)["final_verdict"] == "UNDETERMINED"  # malformed candidate -> liveness exit

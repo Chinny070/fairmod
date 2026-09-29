@@ -2,6 +2,9 @@
 
 Implements Stage 6. IA summary duplicated from ARCHITECTURE.md; this doc adds integration-specific rules.
 
+## Stage 6 audit note
+Re-read against the final (post-audit) `docs/fairmod_schema.json` (30 methods, unchanged from Stage 5) and against `contracts/fairmod.py` directly: every method this doc references (`get_case`, `get_moderation_receipt`, `get_community_stats`, `get_case_precedents`, `run_fairness_mirror`) exists with the signature and field set this doc assumes; no discrepancy found. No frontend code exists yet — this stage is audit-only, per the explicit no-frontend hard stop.
+
 ## Canonical config
 One typed module exporting: chain id (61999), RPC URL, deployed contract address, contract schema/ABI import. Every read/write hook imports from this module — no second hardcoded address anywhere (closes threat #20 in THREAT_MODEL.md).
 

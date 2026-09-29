@@ -1439,6 +1439,19 @@ class FairMod(gl.Contract):
 			# reference at least one real Rule ID (closure Section 5).
 			return {'ok': False, 'reason': NEEDS_REVIEW_MALFORMED_OUTPUT}
 
+		if verdict != VERDICT_FLAGGED and len(violated_rule_ids) > 0:
+			# Stage 6 hardening: the converse contradiction — ALLOWED (or
+			# NEEDS_REVIEW) citing violated Rule IDs — is equally invalid and
+			# was NOT previously rejected (only the FLAGGED-implies-nonempty
+			# direction was enforced). An ALLOWED verdict asserts no listed
+			# rule was violated; carrying rule citations anyway is internally
+			# contradictory per docs/ADJUDICATION.md's own validation contract
+			# ("internally contradictory output ... rejected") and would
+			# otherwise persist a false "this rule was implicated" signal
+			# into `violated_rule_ids_joined`/`final_rule_ids_joined`, which
+			# `get_case_precedents` later surfaces as apparent precedent.
+			return {'ok': False, 'reason': NEEDS_REVIEW_MALFORMED_OUTPUT}
+
 		explanation = raw.get('explanation', '')
 		if not isinstance(explanation, str) or len(explanation) > MAX_EXPLANATION_LEN:
 			return {'ok': False, 'reason': NEEDS_REVIEW_MALFORMED_OUTPUT}
@@ -1853,6 +1866,16 @@ class FairMod(gl.Contract):
 			final_rule_ids.append(rid)
 
 		if final_verdict == VERDICT_FLAGGED and len(final_rule_ids) == 0:
+			return {'ok': False}
+
+		if final_verdict != VERDICT_FLAGGED and len(final_rule_ids) > 0:
+			# Stage 6 hardening: same converse contradiction as
+			# _validate_candidate — an OVERTURN whose final_verdict is
+			# ALLOWED must not carry final Rule ID citations (final_verdict
+			# NEEDS_REVIEW is already rejected above), or a false
+			# "this rule was implicated" signal would persist into
+			# `final_rule_ids_joined` and later surface via
+			# `get_case_precedents`.
 			return {'ok': False}
 
 		return {
