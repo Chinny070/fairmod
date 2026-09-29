@@ -15,3 +15,16 @@ One real, authorized development/test transaction was submitted using the dispos
 - **Contract queryable**: NO — `schema`/`code` both return "Contract ... not found"
 
 Full detail, comparison against the two earlier failed deployments, and toolchain-contamination cross-check in [docs/STUDIONET_61999_CLEAN_PROBE_RESULT.md](STUDIONET_61999_CLEAN_PROBE_RESULT.md). This is the first genuinely live StudioNet action recorded in this file. No canonical/final wallet was used; no FairMod deployment was attempted.
+
+## StudioNet 61999 header-boundary fix — clean probe redeployment, BREAKTHROUGH (2026-09-29)
+
+Following a hypothesis that the long introductory `#`-comment block between the `Depends` header and the first `import` (present in every one of the four prior `invalid_contract` reproductions) was material to the failure, that comment block was removed from `contracts/fairmod.py` and both diagnostic probe files (commit `49f65f6`, comment-only deletions — no logic/hash change). A freshly redeployed clean probe with the corrected header shape was submitted using the same disposable `my-studionet-wallet` account.
+
+- **Transaction hash**: `0xa8d1b91da1af0e39e95cbe52d169f318d95985677664d368fd7d2e37cbc62bdb`
+- **Resulting contract address**: `0x34de82ecfd04d1aF9284C79c033c7ecb8fE912f9`
+- **Protocol status**: FINALIZED (confirmed via CLI receipt and independently via `explorer-studio.genlayer.com`)
+- **GenVM execution result**: **SUCCESS** — Result Code `Return`, return value `null`
+- **Contract queryable**: **YES** — `genlayer schema`/`genlayer code` both succeed and match the deployed source exactly
+- **`get_probe()`**: returns exactly `FAIRMOD_61999_CLEANROOM_OK`
+
+This is the first fully successful StudioNet 61999 deployment in this project's history. Full detail, including what this does and does not yet establish, and next steps, in [docs/STUDIONET_61999_HEADER_BOUNDARY_FIX_RESULT.md](STUDIONET_61999_HEADER_BOUNDARY_FIX_RESULT.md). FairMod itself has **not** been deployed — only the diagnostic probe. No canonical wallet was used.
