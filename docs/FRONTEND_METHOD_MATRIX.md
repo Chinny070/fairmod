@@ -1,5 +1,14 @@
 # Stage 7 — Method-to-UI Integration Matrix
 
+## Stage 7.1 update
+All 30/30 methods are now intentionally represented through usable UI, not just the adapter layer. The six methods previously "adapter only" are now wired into the product:
+
+- `grant_role`/`revoke_role` — Community detail's new **Administration** tab (`frontend/src/pages/community/AdministrationTab.tsx`), visible only to a connected wallet, gated to the community owner (contract-authoritative; frontend gating is convenience only per Stage 7 §20), with a target-account role lookup, a confirmation dialog before every grant/revoke, and the mandatory write→observe→reread pipeline.
+- `create_constitution_draft`/`add_rule`/`activate_constitution` — a "Draft a new constitution version" disclosure inside the Constitution tab (`frontend/src/pages/community/ConstitutionAuthoringTab.tsx`), gated to OWNER/ADMIN, showing the current active version, the draft's accumulating rules, a Rule-ID format validator, and an explicit confirmation dialog before activation naming its irreversibility.
+- `add_context` — Case detail's **Context** section (`frontend/src/components/ContextSection.tsx`), visually and semantically distinct from both Evidence and the Verdict, with an explanatory note that context is weighed by the adjudicator, not independently authoritative.
+
+`get_case_state` remains the one method still reached only through the adapter rather than a separate UI control — see the table row below for why that is a deliberate, documented choice (every UI surface that needs case state already has the full `get_case` dict, so a second, narrower call would add a redundant network round trip with no new information).
+
 All 30 public methods from `docs/fairmod_schema.json` (Stage 6 hash `417cf3de5fef4e6e3a28c0d63510771f18e923dcf42a1f94295a1dc7d3c72d36`), each accounted for.
 
 | Method | V/W | Who can call (contract-enforced) | UI surface | Inputs | Output | Payable | Preconditions | Success state | Error state | Post-write reread | Test coverage |
@@ -7,17 +16,17 @@ All 30 public methods from `docs/fairmod_schema.json` (Stage 6 hash `417cf3de5fe
 | `create_community` | W | anyone | `/communities/new` | name, metadata | community_id (via reread of `list_communities`) | No | none | new community list contains one more id than before | `INVALID_INPUT` | `list_communities` length +1 | adapter test + writeAndConfirm test |
 | `get_community` | V | anyone | Community directory, Community detail header | community_id | dict | — | exists | renders | `PRECONDITION_FAILED` | — | adapter test |
 | `list_communities` | V | anyone | Community directory | none | array | — | none | renders | `RPC_FAILURE` | — | used by CreateCommunity confirm |
-| `grant_role` | W | community owner | Community admin panel (not yet a dedicated page this stage — see Known Non-Blocking Limitations) | community_id, target, role | none | No | caller is owner | `get_role(target)` returns granted role | `ROLE_NOT_AUTHORIZED` | `get_role` | adapter test (exact arg order) |
-| `revoke_role` | W | community owner | same as above | community_id, target | none | No | caller is owner | `get_role(target)` returns `NONE` | `ROLE_NOT_AUTHORIZED` | `get_role` | covered by adapter boundary pattern (grant_role test) |
+| `grant_role` | W | community owner | Administration tab (AdministrationTab.tsx) | community_id, target, role | none | No | caller is owner | `get_role(target)` returns granted role | `ROLE_NOT_AUTHORIZED` | `get_role` | adapter test (exact arg order) |
+| `revoke_role` | W | community owner | Administration tab | community_id, target | none | No | caller is owner | `get_role(target)` returns `NONE` | `ROLE_NOT_AUTHORIZED` | `get_role` | adapter boundary test + live in AdministrationTab |
 | `get_role` | V | anyone | Community detail header (“your role”) | community_id, target | string | — | none | renders | `RPC_FAILURE` | — | used live in CommunityDetail |
-| `create_constitution_draft` | W | OWNER/ADMIN | Constitution tab admin panel (deferred — see limitations) | community_id | version (int) | No | caller has role | new draft version exists | `ROLE_NOT_AUTHORIZED` | `get_constitution` | covered by adapter pattern |
-| `add_rule` | W | OWNER/ADMIN | same | community_id, version, rule fields | none | No | constitution is DRAFT | rule appears in `get_constitution` | `PRECONDITION_FAILED` / `INVALID_INPUT` | `get_constitution` | covered by adapter pattern |
-| `activate_constitution` | W | OWNER/ADMIN | same | community_id, version | none | No | DRAFT, ≥1 rule | `get_active_constitution_version` updates | `ROLE_NOT_AUTHORIZED` / `PRECONDITION_FAILED` | `get_active_constitution_version` | covered by adapter pattern |
+| `create_constitution_draft` | W | OWNER/ADMIN | Constitution Authoring disclosure | community_id | version (int) | No | caller has role | new draft version exists | `ROLE_NOT_AUTHORIZED` | `get_constitution` | live in ConstitutionAuthoringTab |
+| `add_rule` | W | OWNER/ADMIN | Constitution Authoring disclosure | community_id, version, rule fields | none | No | constitution is DRAFT | rule appears in `get_constitution` | `PRECONDITION_FAILED` / `INVALID_INPUT` | `get_constitution` | live in ConstitutionAuthoringTab, Rule-ID validated client-side |
+| `activate_constitution` | W | OWNER/ADMIN | Constitution Authoring disclosure | community_id, version | none | No | DRAFT, ≥1 rule | `get_constitution` status becomes ACTIVE | `ROLE_NOT_AUTHORIZED` / `PRECONDITION_FAILED` | `get_constitution` | live in ConstitutionAuthoringTab, behind an explicit confirmation dialog |
 | `get_constitution` | V | anyone | Constitution tab | community_id, version | dict | — | exists | renders rulebook | `PRECONDITION_FAILED` | — | live in CommunityDetail |
 | `get_active_constitution_version` | V | anyone | Community detail, case creation eligibility | community_id | int | — | none | renders | `RPC_FAILURE` | — | live in CommunityDetail |
 | `create_case` | W | anyone | Community Overview tab (“Submit a case”) | community_id, content | case_id | No | active constitution exists | new case reachable via `get_community_cases` | `PRECONDITION_FAILED` (no active constitution) / `INVALID_INPUT` | `list_communities`/case count | adapter pattern; UI shows tx hash, case_id resolved on reread |
 | `get_case` | V | anyone | Case detail (core) | case_id | dict | — | exists | renders | `PRECONDITION_FAILED` | — | live everywhere in CaseDetail |
-| `add_context` | W | anyone (case OPEN) | Case detail — not yet a dedicated form this stage (see limitations); covered by adapter | case_id, kind, content | none | No | case OPEN | context list grows | `PRECONDITION_FAILED` | `get_context` | adapter pattern |
+| `add_context` | W | anyone (case OPEN) | Case detail — Context section (ContextSection.tsx) | case_id, kind, content | none | No | case OPEN | context list grows | `PRECONDITION_FAILED` | `get_context` | live in CaseDetail |
 | `get_context` | V | anyone | Case detail | case_id | array | — | none | renders | `RPC_FAILURE` | — | live in CaseDetail |
 | `submit_evidence` | W | anyone (case OPEN) | Case detail — Evidence section | case_id, type, reference, category, representation | evidence_id | No | case OPEN | evidence list grows | `INVALID_INPUT` (bad URL/bounds) | `list_evidence` | live in CaseDetail; client-side URL preview via `previewEvidenceUrl` |
 | `get_evidence` | V | anyone | Evidence row | case_id, evidence_id | dict | — | exists | renders | `PRECONDITION_FAILED` | — | live in CaseDetail |
@@ -38,4 +47,4 @@ All 30 public methods from `docs/fairmod_schema.json` (Stage 6 hash `417cf3de5fe
 ## Intentionally not a primary button this stage
 
 - `get_case_state`: subsumed by `get_case` in every UI surface that needs case state, to avoid two calls where one already returns everything. The adapter function exists and is directly tested; wiring a redundant UI call would add no information.
-- `grant_role`/`revoke_role`/`create_constitution_draft`/`add_rule`/`activate_constitution`/`add_context`: all have adapter functions, are directly covered by the adapter boundary test pattern, and are reachable by any developer/integrator today via the adapter layer — but a full admin console UI (role management table, constitution drafting wizard, context-attachment form) was not built as a dedicated page within this stage's time budget. This is an honest, disclosed scope limitation (see the Stage 7 report's "Known Non-Blocking Limitations"), not an accidentally-unreachable capability: the schema is fully wired at the adapter layer, only the admin-console UI chrome around four of the thirty methods is deferred.
+*(Stage 7.1: all six of these are now wired into usable UI — see the update note at the top of this file. No method remains adapter-only except `get_case_state`, documented above.)*

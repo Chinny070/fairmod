@@ -1,5 +1,8 @@
 # Stage 7 — Hosted Verification Matrix
 
+## Stage 7.1 update
+Added: automated accessibility testing (`axe-core` via `vitest-axe`, 5 pages/components checked, 0 violations found — `color-contrast` explicitly disabled with a documented reason, since jsdom has no real rendering engine to measure it against); a real-browser responsive/overflow check (genuine automated `document.documentElement.scrollWidth > clientWidth` measurement, driven via the Claude Code browser pane against the actual dev server at mobile/tablet/desktop-pane widths, using a dev-gated stress-test route with long addresses/URLs/rule text/explanations) — this **found and fixed a real page-wide horizontal-overflow bug** at mobile width caused by unbroken long tokens (see `frontend/src/styles/app.css`'s `overflow-wrap: anywhere` additions); wallet edge-case unit tests (10 new tests: provider absent, connect accepted/rejected, account/chain change events, wrong-network detection, malformed provider errors); a security regression suite (10 new tests: a real filesystem scan for `dangerouslySetInnerHTML`, XSS/script-injection rendering checks, malicious-URL-scheme rejection, cross-case/cross-community adapter-argument isolation, color-independent status labeling); and a bundle-composition investigation (see below). Total frontend tests: 66 (was 38).
+
 Honest status per Stage 7 §35: nothing requiring a deployed FairMod contract on StudioNet is marked PASS. `genlayerlabs/genvm-manager#50` remains open; the clean-probe reproduction (`docs/STUDIONET_61999_CLEAN_PROBE_RESULT.md`) shows the identical `FINALIZED`/`execution_result: ERROR`/`invalid_contract` signature persists under a fully cleaned toolchain, so a live FairMod deployment is not currently possible.
 
 | Test | Local | Mocked | Direct Mode | Real StudioNet | Status | Evidence | Blocker |
@@ -14,11 +17,27 @@ Honest status per Stage 7 §35: nothing requiring a deployed FairMod contract on
 | Real `web.get`/`web.render` evidence acquisition observed through the UI | — | — | — | No | **BLOCKED** | — | genlayerlabs/genvm-manager#50 |
 | Real cross-validator adjudication consensus observed through the UI | — | — | — | No | **BLOCKED** | — | genlayerlabs/genvm-manager#50 |
 | Real challenge/finality timing against StudioNet's actual block/transaction clock | — | — | — | No | **BLOCKED** | — | genlayerlabs/genvm-manager#50 |
-| Wallet connect / disconnect / account-change / chain-change detection against a real injected provider | Manual only | — | — | Partial (network detection logic exercised against StudioNet RPC directly, no live wallet session in this stage) | **PARTIAL** | `src/adapter/useWallet.ts` implemented, EIP-1193 event handlers wired; not exercised against a live browser wallet extension this stage | Requires a manual browser session with MetaMask — deferred to reviewer/manual QA, not a code gap |
-| Production build (`vite build` + `tsc -b`) | Yes | — | — | — | see Stage 7 report for PASS/FAIL | build output | — |
-| Lint (`eslint`) | Yes | — | — | — | see Stage 7 report | lint output | — |
-| Accessibility (automated) | Not run this stage | — | — | — | **NOT RUN** | — | No automated a11y tool (e.g. axe) was wired into the test suite this stage — manual structural review only (semantic HTML, labels, `role="alert"`/`role="status"`, focus-visible tokens) |
-| Responsive layout at representative breakpoints | Manual/CSS review only | — | — | — | **NOT AUTOMATED** | `src/styles/app.css` media query at 640px | No screenshot-diff or viewport test harness wired this stage |
+| Wallet connect / disconnect / account-change / chain-change detection | Yes (fake in-memory EIP-1193 provider) | Yes | — | No (no live wallet session performed, per explicit instruction) | **PASS (unit-level)** | `src/adapter/useWallet.test.ts` — 10 tests: provider absent, connect accepted/rejected, wrong network, account/chain change events, malformed provider errors, disconnect | Live browser-extension QA remains deferred to Stage 8/hosted verification |
+| No write control becomes reachable under an invalid network/account state | Yes | Yes | — | — | **PASS** | `canWrite()` gate (`src/adapter/useWallet.ts`) applied to every write button across CreateCommunity, CaseDetail, ContextSection, AdministrationTab, ConstitutionAuthoringTab — verified by code review, not merely a per-component unit test | — |
+| Automated accessibility (axe-core) | Yes | — | — | — | **PASS** | `src/test/a11y.test.tsx` — 5 checks, 0 violations (color-contrast rule disabled with documented reason — jsdom has no real renderer to measure it) | Full-page accessibility of routes requiring a live/mocked contract (CommunityDetail, CaseDetail) not yet covered by an automated axe pass — manual structural review only for those |
+| Responsive / horizontal-overflow check | Yes (real browser render via the Claude Code browser pane, not jsdom) | — | — | — | **PASS** (after one real bug found and fixed) | Genuine `scrollWidth`/`clientWidth` measurement at 375px/768px/desktop-pane width against the actual running dev server, using a dev-gated long-content stress route (`src/pages/DevPreview.tsx`, gated by `VITE_FAIRMOD_DEV_MODE`, inert in any build without it set) | This is real-browser verification, not a jsdom unit test and not a claim of full pixel-level visual regression testing across every breakpoint/route combination — it exercised the worst-case long-content shapes (long address, long URL, long rule text, long explanation) at 3 representative widths, not an exhaustive route×breakpoint matrix |
+| Production build (`vite build` + `tsc -b`) | Yes | — | — | — | **PASS** | build output, 3 chunks, no unresolved warnings | — |
+| Lint (`eslint`) | Yes | — | — | — | **PASS** | 0 errors, 1 benign warning | — |
+| Security regression (XSS/script injection, dangerous URL schemes, cross-case/community argument isolation) | Yes | Yes | — | — | **PASS** | `src/test/security.test.tsx` — 10 tests, including a real filesystem scan confirming zero uses of `dangerouslySetInnerHTML` anywhere in `src/` | — |
+
+## Bundle investigation (Stage 7.1 Gap 5)
+
+**Before** (Stage 7): one JS chunk, 731.51 kB raw / 178.60 kB gzip, over Vite's 500kB advisory.
+
+**Composition investigated**: `genlayer-js`'s own bundled output is small (`dist/index.js` ≈ 84KB), but it depends on `viem` (an EVM RPC/ABI/crypto library) for signing, RLP/ABI encoding, and chain definitions — the actual bulk of the bundle. `genlayer-js` is imported by `src/adapter/client.ts`, which is imported by `WalletProvider`, which wraps the entire app at the router root (`main.tsx`) — because **public, wallet-free read-only browsing requires a working read client on first paint** (Stage 7 §10's explicit requirement that browsing never require a wallet). Route-level lazy-loading of *pages* would not defer this dependency, since nearly every route needs a read client immediately.
+
+**Change made**: added a Rollup `manualChunks` split (`vite.config.ts`) putting `genlayer-js` (and its `viem` dependency) into its own `genlayer-vendor` chunk, separate from application code.
+
+**After**: two JS chunks — `index` (app code) 213.49 kB raw / 67.47 kB gzip, `genlayer-vendor` (SDK) 534.78 kB raw / 116.13 kB gzip. **Total bytes are essentially unchanged** (748.27 kB vs 731.51 kB raw — the split itself adds a small amount of chunk overhead; total gzip 183.6 kB vs 178.60 kB before). This is honestly a **caching improvement, not a size reduction**: application-code deploys (which change far more often than the pinned `genlayer-js@1.1.8` dependency) no longer invalidate the browser cache for the SDK chunk.
+
+**What was explicitly NOT done**: no fork of `genlayer-js`, no removal of SDK functionality, no swap to an RC/unstable SDK line, no fragile bundler hack to hide the number. `chunkSizeWarningLimit` was raised specifically to 600 (not disabled globally) with an inline comment explaining exactly which chunk it covers and why, so the warning still fires if some *other*, unexpected chunk grows past 500kB in the future.
+
+**BUNDLE ADVISORY: ACCEPTED WITH JUSTIFICATION** — the `genlayer-vendor` chunk's size is inherent to depending on a real EVM-compatible wallet/RPC SDK for a Web3 application requiring immediate wallet-free reads, not a defect in this codebase.
 
 ## What "Direct Mode" columns mean here
 

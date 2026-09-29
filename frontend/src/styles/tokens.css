@@ -1,53 +1,69 @@
 /**
- * FairMod design tokens — "Civic Editorial / Underground Print" direction
- * (see docs/DESIGN_SYSTEM.md for the full rationale and palette
- * documentation). Distinctive to FairMod: not reused from Continuum
- * Protocol, Protocol Court, AgentCourt, or any other prior project's
- * palette (Electric Verdict, CANON, CLAUSE all explicitly avoided).
+ * FairMod design tokens — "Broadsheet" (Civic Editorial / Underground
+ * Print), adapted from the Refero Styles "Popcorn" DESIGN.md
+ * (https://styles.refero.design/style/93fe74fd-bac8-4d13-9d5b-3b5e242f74e6)
+ * per the Stage 7.1 design-source correction. See docs/DESIGN_SYSTEM.md for
+ * the full research record (styles reviewed, why Popcorn was selected, and
+ * exactly what was adapted rather than copied).
  *
- * Palette name: "BROADSHEET." Built around a warm, slightly aged newsprint
- * paper tone, a single deep masthead ink, and one warm civic-stamp red used
- * ONLY for FLAGGED/challenge-critical accents — never for decoration.
+ * What was ADAPTED, not cloned: Popcorn's near-monochrome warm-graphite/
+ * cream-canvas palette and its high-contrast serif display type are
+ * carried over almost directly (they fit a "public record" register very
+ * well). Popcorn's pill-everything (100px radius on every button/nav/
+ * badge) was deliberately REJECTED — a civic rulebook/court record reads as
+ * formal, not as a consumer app, so FairMod keeps low, legal-document-style
+ * radii (2-4px) instead. FairMod's own functional verdict colors (allowed/
+ * flagged/review/undetermined) are new additions Popcorn's near-monochrome
+ * system doesn't have, since FairMod's status information must never rely
+ * on color alone but still benefits from a clear, distinct color per
+ * verdict alongside its icon+label.
  */
 :root {
-	/* Paper + ink (light) */
-	--fm-paper: #f3ecdf;
+	/* Paper + ink (light) — adapted from Popcorn's Cream Canvas/Warm Graphite */
+	--fm-paper: #f7f4ee;
 	--fm-paper-raised: #ffffff;
-	--fm-paper-dim: #e8dfcd;
-	--fm-ink: #241f1a;
-	--fm-ink-soft: #4a4137;
-	--fm-ink-faint: #948a7a;
-	--fm-rule: #d8cdb3;
+	--fm-paper-dim: #ece6d8;
+	--fm-ink: #393737; /* Popcorn's Warm Graphite, used directly */
+	--fm-ink-soft: #5c5856;
+	--fm-ink-faint: #888787; /* Popcorn's Fog Gray, used directly */
+	--fm-rule: #e2dccb;
 
-	/* Masthead + identity */
-	--fm-masthead: #1f3a3d; /* deep gazette teal-ink */
-	--fm-masthead-tint: #e4ecec;
+	/* Masthead + identity — FairMod-specific, distinct from Popcorn's near-monochrome system (a civic outlet needs its own identity ink, not pure graphite) */
+	--fm-masthead: #1f3a3d;
+	--fm-masthead-tint: #e9eef0;
 
-	/* Verdicts (never color-only — always paired with icon/label; see components) */
-	--fm-allowed: #2f5d3a; /* civic ledger green */
+	/* Verdicts — FairMod-specific, never color-only (always paired with icon/label) */
+	--fm-allowed: #2f5d3a;
 	--fm-allowed-bg: #e7efe4;
-	--fm-flagged: #9a2b1f; /* stamp red */
+	--fm-flagged: #9a2b1f;
 	--fm-flagged-bg: #f6e4e0;
-	--fm-review: #8a6a1e; /* amber annotation */
+	--fm-review: #8a6a1e;
 	--fm-review-bg: #f3ecd8;
 	--fm-undetermined: #55504a;
 	--fm-undetermined-bg: #e9e4d9;
 
-	/* Non-authoritative surfaces (precedent, Fairness Mirror) — deliberately desaturated + dashed so they never read as binding */
-	--fm-nonauthoritative-border: #b8ab8c;
-	--fm-nonauthoritative-bg: #efe9da;
+	/* Non-authoritative surfaces (precedent, Fairness Mirror) */
+	--fm-nonauthoritative-border: #c2b89e;
+	--fm-nonauthoritative-bg: #f0ead9;
 
 	/* Links + interactive */
 	--fm-link: #1f3a3d;
 	--fm-focus: #9a2b1f;
 
-	--fm-font-display: 'Source Serif 4', Georgia, 'Times New Roman', serif;
-	--fm-font-body: 'Source Serif 4', Georgia, serif;
+	/* Popcorn's soft elevation shadow, used sparingly (dialogs, receipt cards) */
+	--fm-shadow-lg: rgba(0, 0, 0, 0.06) 0px 4px 20px 0px;
+
+	/* Typography — Popcorn's serif-display/humanist-sans pairing, substituted with metrically-compatible open fonts per Popcorn's own documented substitute list */
+	--fm-font-display: 'Source Serif 4', 'Tiempos Headline', Georgia, serif; /* Popcorn substitute for Untitled Serif */
+	--fm-font-body: 'Inter', 'General Sans', -apple-system, sans-serif; /* Popcorn substitute for Messina Sans */
 	--fm-font-mono: 'IBM Plex Mono', ui-monospace, monospace;
 
+	/* Radii — deliberately NOT Popcorn's 100px pill system; low, formal, document-register radii */
 	--fm-radius-sm: 2px;
 	--fm-radius-md: 4px;
+	--fm-radius-card: 8px;
 
+	/* Spacing scale, in Popcorn's own token cadence */
 	--fm-space-1: 4px;
 	--fm-space-2: 8px;
 	--fm-space-3: 12px;
@@ -62,12 +78,12 @@
 
 @media (prefers-color-scheme: dark) {
 	:root:not([data-theme='light']) {
-		--fm-paper: #1b1815;
-		--fm-paper-raised: #232019;
+		--fm-paper: #1c1a16;
+		--fm-paper-raised: #242119;
 		--fm-paper-dim: #15130f;
-		--fm-ink: #ece5d6;
-		--fm-ink-soft: #c9bfab;
-		--fm-ink-faint: #8a8071;
+		--fm-ink: #eae6dd;
+		--fm-ink-soft: #c4bfb2;
+		--fm-ink-faint: #918c80;
 		--fm-rule: #3a3428;
 
 		--fm-masthead: #6ea8ab;
@@ -88,17 +104,19 @@
 		--fm-link: #8fc4c6;
 		--fm-focus: #e2685a;
 
+		--fm-shadow-lg: rgba(0, 0, 0, 0.3) 0px 4px 20px 0px;
+
 		color-scheme: dark;
 	}
 }
 
 :root[data-theme='dark'] {
-	--fm-paper: #1b1815;
-	--fm-paper-raised: #232019;
+	--fm-paper: #1c1a16;
+	--fm-paper-raised: #242119;
 	--fm-paper-dim: #15130f;
-	--fm-ink: #ece5d6;
-	--fm-ink-soft: #c9bfab;
-	--fm-ink-faint: #8a8071;
+	--fm-ink: #eae6dd;
+	--fm-ink-soft: #c4bfb2;
+	--fm-ink-faint: #918c80;
 	--fm-rule: #3a3428;
 	--fm-masthead: #6ea8ab;
 	--fm-masthead-tint: #1c2c2d;
@@ -114,6 +132,7 @@
 	--fm-nonauthoritative-bg: #211e17;
 	--fm-link: #8fc4c6;
 	--fm-focus: #e2685a;
+	--fm-shadow-lg: rgba(0, 0, 0, 0.3) 0px 4px 20px 0px;
 	color-scheme: dark;
 }
 

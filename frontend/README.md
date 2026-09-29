@@ -45,6 +45,13 @@ See `../docs/FRONTEND_METHOD_MATRIX.md` for the full method-to-UI matrix coverin
 
 Every write goes through `src/adapter/writeAndConfirm.ts`: submit → observe (protocol status + GenVM execution result, via `src/adapter/txLifecycle.ts`) → **always** re-read authoritative contract state → only then compute `applicationConfirmed`. No UI component may show a "success" state from a transaction hash or a `FINALIZED` protocol status alone — this was a real, previously-observed failure mode (a `FINALIZED` transaction with GenVM `execution_result: ERROR`; see `../docs/STUDIONET_61999_CLEAN_PROBE_RESULT.md`).
 
+## Community administration & constitution authoring (Stage 7.1)
+
+All 30 public contract methods now have usable UI, not just adapter wiring — see `../docs/FRONTEND_METHOD_MATRIX.md`. Notably:
+- **Administration tab** (Community detail): grant/revoke ADMIN/MODERATOR roles, gated to the community owner, with a confirmation dialog before every change.
+- **Constitution authoring** (Constitution tab, "Draft a new constitution version"): create a draft, add rules with client-side Rule-ID format validation, and activate — gated to OWNER/ADMIN, with an explicit confirmation dialog before activation (irreversible).
+- **Case context** (Case detail): add background context, visually and semantically distinct from Evidence and the Verdict.
+
 ## Testing
 
 ```bash
@@ -54,7 +61,15 @@ npm test
 npm run build
 ```
 
-Test categories: domain unit tests (`src/domain/*.test.ts`), adapter boundary tests mocking the `genlayer-js` client exactly (`src/adapter/fairmodAdapter.test.ts`), transaction lifecycle tests including the exact `FINALIZED`+`execution_result: ERROR` shape (`src/adapter/txLifecycle.test.ts`), and the write→observe→reread pipeline (`src/adapter/writeAndConfirm.test.ts`).
+66 tests across 8 files. Categories: domain unit tests (`src/domain/*.test.ts`), adapter boundary tests mocking the `genlayer-js` client exactly (`src/adapter/fairmodAdapter.test.ts`), transaction lifecycle tests including the exact `FINALIZED`+`execution_result: ERROR` shape (`src/adapter/txLifecycle.test.ts`), the write→observe→reread pipeline (`src/adapter/writeAndConfirm.test.ts`), wallet edge cases against a fake in-memory EIP-1193 provider (`src/adapter/useWallet.test.ts` — no live wallet transaction is ever performed by this suite), automated accessibility checks via `axe-core`/`vitest-axe` (`src/test/a11y.test.tsx`), and a security regression suite including a real filesystem scan for `dangerouslySetInnerHTML` (`src/test/security.test.tsx`).
+
+### Responsive verification
+
+Automated overflow detection (`document.documentElement.scrollWidth > clientWidth`) was run against the real dev server at mobile/tablet/desktop-pane widths using a dev-gated long-content stress route (`src/pages/DevPreview.tsx`, only reachable with `VITE_FAIRMOD_DEV_MODE=true`, inert otherwise). This found and fixed a real page-wide horizontal-overflow bug caused by unbroken long tokens (addresses/URLs) — see `src/styles/app.css`'s `overflow-wrap: anywhere` rules. This is real-browser verification, not an exhaustive pixel-level visual regression suite across every route×breakpoint combination — see `../docs/FRONTEND_HOSTED_VERIFICATION_MATRIX.md` for the precise scope.
+
+### Bundle
+
+Two chunks: app code (~213kB/67kB gzip) and a `genlayer-vendor` chunk (~535kB/116kB gzip) containing `genlayer-js`+`viem`, split via `vite.config.ts`'s `manualChunks` for browser-cache efficiency across deploys (not a size reduction — the SDK's size is inherent to being a real Web3 wallet/RPC library). See `../docs/FRONTEND_HOSTED_VERIFICATION_MATRIX.md` for the full investigation.
 
 ## Mock/dev mode restrictions
 

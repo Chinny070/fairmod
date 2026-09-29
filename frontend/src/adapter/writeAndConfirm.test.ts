@@ -50,6 +50,16 @@ describe('writeAndConfirm — the anti-false-positive pipeline', () => {
 		expect(reread).toHaveBeenCalled();
 	});
 
+	it('submit is called exactly once per writeAndConfirm invocation (double-click protection is the caller’s "busy" flag; this pins that writeAndConfirm itself never internally retries/duplicates the submit call)', async () => {
+		vi.spyOn(txLifecycle, 'observeTransaction').mockResolvedValue(mockObservation());
+		const submit = vi.fn().mockResolvedValue(HASH);
+		const reread = vi.fn().mockResolvedValue({ state: 'X' });
+
+		await writeAndConfirm({} as never, submit, reread, () => true);
+
+		expect(submit).toHaveBeenCalledTimes(1);
+	});
+
 	it('normalizes a reread failure to STATE_NOT_CONFIRMED rather than swallowing it', async () => {
 		vi.spyOn(txLifecycle, 'observeTransaction').mockResolvedValue(mockObservation());
 		const submit = vi.fn().mockResolvedValue(HASH);

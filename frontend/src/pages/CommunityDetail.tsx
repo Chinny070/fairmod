@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useWalletContext } from '../adapter/WalletProvider';
+import { canWrite } from '../adapter/useWallet';
 import { getConfiguredContractAddress } from '../config/network';
 import { useAsync } from '../hooks/useAsync';
 import {
@@ -14,9 +15,11 @@ import {
 } from '../adapter/fairmodAdapter';
 import { BOUNDS } from '../domain/constraints';
 import { VerdictBadge } from '../components/VerdictBadge';
+import { AdministrationTab } from './community/AdministrationTab';
+import { ConstitutionAuthoringTab } from './community/ConstitutionAuthoringTab';
 import type { Community, Constitution, CommunityStats, Case } from '../domain/types';
 
-type Tab = 'overview' | 'constitution' | 'cases' | 'transparency';
+type Tab = 'overview' | 'constitution' | 'cases' | 'transparency' | 'administration';
 
 export function CommunityDetail() {
 	const { communityId = '' } = useParams();
@@ -48,7 +51,7 @@ export function CommunityDetail() {
 			</header>
 
 			<nav className="fm-tabs" aria-label="Community sections">
-				{(['overview', 'constitution', 'cases', 'transparency'] as Tab[]).map((t) => (
+				{(['overview', 'constitution', 'cases', 'transparency', 'administration'] as Tab[]).map((t) => (
 					<button key={t} type="button" aria-current={tab === t} onClick={() => setTab(t)}>
 						{t[0].toUpperCase() + t.slice(1)}
 					</button>
@@ -56,20 +59,41 @@ export function CommunityDetail() {
 			</nav>
 
 			{tab === 'overview' && (
-				<OverviewTab communityId={communityId} address={address} client={wallet.client} canSubmit={wallet.status === 'connected'} />
+				<OverviewTab communityId={communityId} address={address} client={wallet.client} canSubmit={canWrite(wallet)} />
 			)}
 			{tab === 'constitution' && (
-				<ConstitutionTab
-					communityId={communityId}
-					address={address}
-					client={wallet.client}
-					activeVersion={activeVersion.status === 'success' ? activeVersion.data : undefined}
-				/>
+				<>
+					<ConstitutionTab
+						communityId={communityId}
+						address={address}
+						client={wallet.client}
+						activeVersion={activeVersion.status === 'success' ? activeVersion.data : undefined}
+					/>
+					{canWrite(wallet) && (
+						<details className="fm-authoring-disclosure">
+							<summary>Draft a new constitution version</summary>
+							<ConstitutionAuthoringTab
+								communityId={communityId}
+								address={address}
+								isAuthorized={role.status === 'success' && (role.data === 'OWNER' || role.data === 'ADMIN')}
+								activeVersion={activeVersion.status === 'success' ? activeVersion.data : undefined}
+							/>
+						</details>
+					)}
+				</>
 			)}
 			{tab === 'cases' && (
 				<CasesTab communityId={communityId} address={address} client={wallet.client} page={page} setPage={setPage} pageSize={pageSize} />
 			)}
 			{tab === 'transparency' && <TransparencyTab communityId={communityId} address={address} client={wallet.client} />}
+			{tab === 'administration' && (
+				<AdministrationTab
+					communityId={communityId}
+					address={address}
+					community={community.data}
+					isOwner={canWrite(wallet) && wallet.address?.toLowerCase() === community.data.owner.toLowerCase()}
+				/>
+			)}
 		</article>
 	);
 }

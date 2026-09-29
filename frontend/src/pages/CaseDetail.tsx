@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useWalletContext } from '../adapter/WalletProvider';
+import { canWrite } from '../adapter/useWallet';
 import { getConfiguredContractAddress } from '../config/network';
 import { useAsync } from '../hooks/useAsync';
 import {
@@ -22,6 +23,7 @@ import {
 import { writeAndConfirm } from '../adapter/writeAndConfirm';
 import { VerdictBadge } from '../components/VerdictBadge';
 import { TxStatus } from '../components/TxStatus';
+import { ContextSection } from '../components/ContextSection';
 import { previewEvidenceUrl, BOUNDS } from '../domain/constraints';
 import type { Case, Evidence, ContextItem, ModerationReceipt as ModerationReceiptT, CasePrecedent } from '../domain/types';
 import type { TxObservation } from '../adapter/txLifecycle';
@@ -55,16 +57,10 @@ export function CaseDetail() {
 				<p>{c.content}</p>
 			</section>
 
-			{context.status === 'success' && context.data.length > 0 && (
-				<section>
-					<h2>Context</h2>
-					<ul>
-						{context.data.map((item, i) => (
-							<li key={i}><em>{item.kind}</em>: {item.content}</li>
-						))}
-					</ul>
-				</section>
+			{context.status === 'success' && (
+				<ContextSection caseId={caseId} address={address} contextItems={context.data} caseState={c.state} reload={context.reload} />
 			)}
+			{context.status === 'loading' && <p role="status">Loading context…</p>}
 
 			<EvidenceSection caseId={caseId} address={address} caseState={c} evidenceIds={evidenceIds.status === 'success' ? evidenceIds.data : []} reload={evidenceIds.reload} />
 
@@ -91,7 +87,7 @@ export function CaseDetail() {
 				<>
 					<ReceiptSection caseId={caseId} address={address} client={wallet.client} />
 					<PrecedentSection communityId={c.community_id} address={address} client={wallet.client} ruleIds={c.final_rule_ids} />
-					<FairnessMirrorSection caseId={caseId} address={address} client={wallet.client} status={c.fairness_mirror_status} canRun={wallet.status === 'connected'} />
+					<FairnessMirrorSection caseId={caseId} address={address} client={wallet.client} status={c.fairness_mirror_status} canRun={canWrite(wallet)} />
 				</>
 			)}
 		</article>
@@ -107,6 +103,10 @@ function EvidenceSection({ caseId, address, caseState, evidenceIds, reload }: { 
 
 	async function onSubmitEvidence(e: React.FormEvent) {
 		e.preventDefault();
+		if (!canWrite(wallet)) {
+			setError('Connect a wallet on StudioNet to submit evidence.');
+			return;
+		}
 		try {
 			await submitEvidence(wallet.client, address, caseId, { evidenceType: type, reference: ref, sourceCategory: '' });
 			setRef('');
@@ -149,7 +149,8 @@ function EvidenceSection({ caseId, address, caseState, evidenceIds, reload }: { 
 							This URL will be fetched/rendered independently by each validator — your browser never fetches it on the contract’s behalf.
 						</p>
 					)}
-					<button type="submit" className="fm-button">Submit evidence</button>
+					<button type="submit" className="fm-button" disabled={!canWrite(wallet)}>Submit evidence</button>
+					{!canWrite(wallet) && <p className="fm-field-help">Connect a wallet on StudioNet to submit.</p>}
 					{error && <p role="alert">{error}</p>}
 				</form>
 			)}
@@ -178,7 +179,9 @@ function EvidenceRow({ caseId, address, evidenceId, onAcquire }: { caseId: strin
 				</p>
 			)}
 			{e.retrieval_status === 'PENDING' && (
-				<button type="button" onClick={onAcquire}>Trigger acquisition</button>
+				<button type="button" onClick={onAcquire} disabled={!canWrite(wallet)} title={canWrite(wallet) ? undefined : 'Connect a wallet on StudioNet to trigger acquisition'}>
+					Trigger acquisition
+				</button>
 			)}
 		</li>
 	);
@@ -207,15 +210,18 @@ function LifecycleActions({ caseId, address, caseState, reload }: { caseId: stri
 		}
 	}
 
+	const writeDisabled = busy || !canWrite(wallet);
+
 	return (
 		<section className="fm-actions">
+			{!canWrite(wallet) && <p className="fm-field-help">Connect a wallet on StudioNet to take an action on this case.</p>}
 			{caseState.state === 'OPEN' && (
-				<button type="button" disabled={busy} onClick={() => void run(() => freezeCase(wallet.client, address, caseId), (c) => c.state !== 'OPEN')}>
+				<button type="button" disabled={writeDisabled} onClick={() => void run(() => freezeCase(wallet.client, address, caseId), (c) => c.state !== 'OPEN')}>
 					Freeze case
 				</button>
 			)}
 			{caseState.state === 'EVIDENCE_FROZEN' && (
-				<button type="button" disabled={busy} onClick={() => void run(() => adjudicateCase(wallet.client, address, caseId), (c) => c.state === 'DECIDED' || c.state === 'NEEDS_REVIEW')}>
+				<button type="button" disabled={writeDisabled} onClick={() => void run(() => adjudicateCase(wallet.client, address, caseId), (c) => c.state === 'DECIDED' || c.state === 'NEEDS_REVIEW')}>
 					Request adjudication
 				</button>
 			)}
@@ -225,19 +231,19 @@ function LifecycleActions({ caseId, address, caseState, reload }: { caseId: stri
 						Challenge reason
 						<textarea value={reason} onChange={(e) => setReason(e.target.value)} maxLength={BOUNDS.MAX_CHALLENGE_REASON_LEN} required />
 					</label>
-					<button type="submit" disabled={busy}>File challenge</button>
-					<button type="button" disabled={busy} onClick={() => void run(() => finalizeCase(wallet.client, address, caseId), (c) => c.state === 'FINAL')}>
+					<button type="submit" disabled={writeDisabled}>File challenge</button>
+					<button type="button" disabled={writeDisabled} onClick={() => void run(() => finalizeCase(wallet.client, address, caseId), (c) => c.state === 'FINAL')}>
 						Finalize (after challenge window closes)
 					</button>
 				</form>
 			)}
 			{caseState.state === 'CHALLENGED' && (
-				<button type="button" disabled={busy} onClick={() => void run(() => resolveChallenge(wallet.client, address, caseId), (c) => c.state === 'FINAL')}>
+				<button type="button" disabled={writeDisabled} onClick={() => void run(() => resolveChallenge(wallet.client, address, caseId), (c) => c.state === 'FINAL')}>
 					Resolve challenge
 				</button>
 			)}
 			{caseState.state === 'NEEDS_REVIEW' && (
-				<button type="button" disabled={busy} onClick={() => void run(() => finalizeCase(wallet.client, address, caseId), (c) => c.state === 'FINAL')}>
+				<button type="button" disabled={writeDisabled} onClick={() => void run(() => finalizeCase(wallet.client, address, caseId), (c) => c.state === 'FINAL')}>
 					Finalize (after review deadline)
 				</button>
 			)}

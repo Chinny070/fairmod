@@ -1,6 +1,18 @@
 * { box-sizing: border-box; }
 html, body, #root { height: 100%; }
-body { margin: 0; font-family: var(--fm-font-body); line-height: 1.5; }
+html { overflow-x: hidden; }
+body { margin: 0; font-family: var(--fm-font-body); line-height: 1.5; overflow-x: hidden; }
+
+/* Long unbroken tokens (addresses, hashes, URLs) must never force page-wide
+   horizontal scroll on narrow viewports (Stage 7.1 Gap 2 finding). */
+code, .fm-directory__meta, .fm-community__meta, .fm-case-file h1 {
+	overflow-wrap: anywhere;
+	word-break: break-word;
+}
+a { overflow-wrap: anywhere; }
+img, svg { max-width: 100%; }
+p, li, dd, dt, span { overflow-wrap: anywhere; }
+.fm-main, .fm-shell { max-width: 100%; overflow-x: hidden; }
 
 a { color: var(--fm-link); }
 :focus-visible { outline: 3px solid var(--fm-focus); outline-offset: 2px; }
@@ -26,7 +38,7 @@ a { color: var(--fm-link); }
 
 .fm-footer { padding: var(--fm-space-4) var(--fm-space-5); font-size: 0.8rem; color: var(--fm-ink-faint); border-top: 1px solid var(--fm-rule); }
 
-.fm-lede h1 { font-family: var(--fm-font-display); font-size: 2.25rem; max-width: 20ch; }
+.fm-lede h1 { font-family: var(--fm-font-display); font-size: 2.75rem; letter-spacing: -0.02em; line-height: 1.05; max-width: 18ch; }
 .fm-lede__dek { max-width: 60ch; color: var(--fm-ink-soft); font-size: 1.1rem; }
 .fm-lede__actions { display: flex; gap: var(--fm-space-3); margin-top: var(--fm-space-4); }
 
@@ -70,6 +82,34 @@ form input, form textarea, form select { display: block; width: 100%; margin-top
 .fm-evidence__note { color: var(--fm-review); font-size: 0.85rem; }
 
 .fm-pagination { display: flex; gap: var(--fm-space-3); align-items: center; margin-top: var(--fm-space-4); }
+
+/* Case file — "issue number" masthead treatment, editorial hierarchy */
+.fm-case-file header { border-bottom: 3px double var(--fm-rule); padding-bottom: var(--fm-space-3); margin-bottom: var(--fm-space-5); }
+.fm-case-file h1 { font-family: var(--fm-font-mono); font-weight: 500; font-size: 1.1rem; letter-spacing: 0.02em; color: var(--fm-ink-faint); text-transform: uppercase; margin-bottom: 4px; }
+.fm-case-file__state { font-family: var(--fm-font-display); font-size: 1.3rem; }
+.fm-case-file__content { background: var(--fm-paper-raised); border: 1px solid var(--fm-rule); border-radius: var(--fm-radius-card); padding: var(--fm-space-4); box-shadow: var(--fm-shadow-lg); }
+.fm-case-file section + section { margin-top: var(--fm-space-6); padding-top: var(--fm-space-5); border-top: 1px solid var(--fm-rule); }
+.fm-case-file__verdict { background: var(--fm-paper-dim); border-radius: var(--fm-radius-card); padding: var(--fm-space-4); }
+
+.fm-rule code, .fm-directory__list code { font-family: var(--fm-font-mono); background: var(--fm-paper-dim); padding: 1px 4px; border-radius: var(--fm-radius-sm); font-size: 0.9em; }
+
+.fm-confirm-dialog { position: relative; margin-top: var(--fm-space-3); padding: var(--fm-space-4); background: var(--fm-paper-raised); border: 1px solid var(--fm-ink); border-radius: var(--fm-radius-card); box-shadow: var(--fm-shadow-lg); max-width: 48ch; }
+.fm-confirm-dialog p { margin-top: 0; }
+
+.fm-role-form fieldset { border: 1px solid var(--fm-rule); border-radius: var(--fm-radius-md); padding: var(--fm-space-3); margin: var(--fm-space-3) 0; }
+.fm-role-form fieldset label { display: inline-flex; align-items: center; gap: 4px; margin-right: var(--fm-space-4); }
+.fm-role-form__actions { display: flex; gap: var(--fm-space-3); }
+
+.fm-authoring, .fm-admin { max-width: 60ch; }
+.fm-add-rule { border-top: 1px dashed var(--fm-rule); margin-top: var(--fm-space-4); padding-top: var(--fm-space-4); }
+.fm-rulebook--draft { background: var(--fm-review-bg); border: 1px dashed var(--fm-review); border-radius: var(--fm-radius-card); padding: var(--fm-space-3); }
+
+.fm-context-list { list-style: none; padding: 0; }
+.fm-context-list li { border-left: 3px solid var(--fm-rule); padding-left: var(--fm-space-3); margin-bottom: var(--fm-space-2); }
+.fm-context-note { font-size: 0.8rem; color: var(--fm-ink-faint); margin: var(--fm-space-2) 0; }
+
+.fm-authoring-disclosure { margin-top: var(--fm-space-5); border-top: 1px dashed var(--fm-rule); padding-top: var(--fm-space-4); }
+.fm-authoring-disclosure summary { cursor: pointer; font-weight: 600; }
 
 @media (max-width: 640px) {
 	.fm-masthead { padding: var(--fm-space-3); }

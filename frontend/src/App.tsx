@@ -7,6 +7,7 @@ import { CreateCommunity } from './pages/CreateCommunity';
 import { CaseDetail } from './pages/CaseDetail';
 import { HowItWorks } from './pages/HowItWorks';
 import { NotFound } from './pages/NotFound';
+import { DevPreview } from './pages/DevPreview';
 
 export function App() {
 	return (
@@ -18,6 +19,7 @@ export function App() {
 				<Route path="/communities/:communityId" element={<CommunityDetail />} />
 				<Route path="/cases/:caseId" element={<CaseDetail />} />
 				<Route path="/how-it-works" element={<HowItWorks />} />
+				<Route path="/dev-preview" element={<DevPreview />} />
 				<Route path="*" element={<NotFound />} />
 			</Route>
 		</Routes>

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWalletContext } from '../adapter/WalletProvider';
+import { canWrite } from '../adapter/useWallet';
 import { getConfiguredContractAddress } from '../config/network';
 import { createCommunity, listCommunities } from '../adapter/fairmodAdapter';
 import { writeAndConfirm } from '../adapter/writeAndConfirm';
@@ -25,8 +26,8 @@ export function CreateCommunity() {
 	async function onSubmit(e: React.FormEvent) {
 		e.preventDefault();
 		if (nameError || metadataError || submitting) return;
-		if (wallet.status !== 'connected') {
-			setError('Connect your wallet first.');
+		if (!canWrite(wallet)) {
+			setError('Connect a wallet on StudioNet first.');
 			return;
 		}
 		setSubmitting(true);
@@ -68,9 +69,10 @@ export function CreateCommunity() {
 				</label>
 				<p className="fm-field-help">{metadataError ?? `${metadata.length}/${BOUNDS.MAX_METADATA_LEN}`}</p>
 
-				<button type="submit" className="fm-button fm-button--primary" disabled={submitting || !!nameError || !!metadataError}>
+				<button type="submit" className="fm-button fm-button--primary" disabled={submitting || !!nameError || !!metadataError || !canWrite(wallet)}>
 					{submitting ? 'Submitting…' : 'Create community'}
 				</button>
+				{!canWrite(wallet) && <p className="fm-field-help">Connect a wallet on StudioNet to submit.</p>}
 				{error && <p role="alert">{error}</p>}
 			</form>
 			<TxStatus observation={observation} applicationConfirmed={confirmed} />

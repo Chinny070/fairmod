@@ -94,6 +94,15 @@ export function useWallet(): WalletState {
 	return { status, address, chainId, client, connect, disconnect, error };
 }
 
+/**
+ * The single gate every write-capable UI control must consult (Stage 7.1
+ * Gap 6: "no write becomes available under an invalid network/account
+ * state"). True only when a wallet is connected AND on StudioNet.
+ */
+export function canWrite(wallet: Pick<WalletState, 'status' | 'chainId'>): boolean {
+	return wallet.status === 'connected' && wallet.chainId === STUDIONET.chainId;
+}
+
 export function describeNetworkMismatch(chainId: number | undefined): string | undefined {
 	if (chainId === undefined) return undefined;
 	if (chainId === STUDIONET.chainId) return undefined;
