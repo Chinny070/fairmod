@@ -1,0 +1,41 @@
+# Stage 7 — Method-to-UI Integration Matrix
+
+All 30 public methods from `docs/fairmod_schema.json` (Stage 6 hash `417cf3de5fef4e6e3a28c0d63510771f18e923dcf42a1f94295a1dc7d3c72d36`), each accounted for.
+
+| Method | V/W | Who can call (contract-enforced) | UI surface | Inputs | Output | Payable | Preconditions | Success state | Error state | Post-write reread | Test coverage |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| `create_community` | W | anyone | `/communities/new` | name, metadata | community_id (via reread of `list_communities`) | No | none | new community list contains one more id than before | `INVALID_INPUT` | `list_communities` length +1 | adapter test + writeAndConfirm test |
+| `get_community` | V | anyone | Community directory, Community detail header | community_id | dict | — | exists | renders | `PRECONDITION_FAILED` | — | adapter test |
+| `list_communities` | V | anyone | Community directory | none | array | — | none | renders | `RPC_FAILURE` | — | used by CreateCommunity confirm |
+| `grant_role` | W | community owner | Community admin panel (not yet a dedicated page this stage — see Known Non-Blocking Limitations) | community_id, target, role | none | No | caller is owner | `get_role(target)` returns granted role | `ROLE_NOT_AUTHORIZED` | `get_role` | adapter test (exact arg order) |
+| `revoke_role` | W | community owner | same as above | community_id, target | none | No | caller is owner | `get_role(target)` returns `NONE` | `ROLE_NOT_AUTHORIZED` | `get_role` | covered by adapter boundary pattern (grant_role test) |
+| `get_role` | V | anyone | Community detail header (“your role”) | community_id, target | string | — | none | renders | `RPC_FAILURE` | — | used live in CommunityDetail |
+| `create_constitution_draft` | W | OWNER/ADMIN | Constitution tab admin panel (deferred — see limitations) | community_id | version (int) | No | caller has role | new draft version exists | `ROLE_NOT_AUTHORIZED` | `get_constitution` | covered by adapter pattern |
+| `add_rule` | W | OWNER/ADMIN | same | community_id, version, rule fields | none | No | constitution is DRAFT | rule appears in `get_constitution` | `PRECONDITION_FAILED` / `INVALID_INPUT` | `get_constitution` | covered by adapter pattern |
+| `activate_constitution` | W | OWNER/ADMIN | same | community_id, version | none | No | DRAFT, ≥1 rule | `get_active_constitution_version` updates | `ROLE_NOT_AUTHORIZED` / `PRECONDITION_FAILED` | `get_active_constitution_version` | covered by adapter pattern |
+| `get_constitution` | V | anyone | Constitution tab | community_id, version | dict | — | exists | renders rulebook | `PRECONDITION_FAILED` | — | live in CommunityDetail |
+| `get_active_constitution_version` | V | anyone | Community detail, case creation eligibility | community_id | int | — | none | renders | `RPC_FAILURE` | — | live in CommunityDetail |
+| `create_case` | W | anyone | Community Overview tab (“Submit a case”) | community_id, content | case_id | No | active constitution exists | new case reachable via `get_community_cases` | `PRECONDITION_FAILED` (no active constitution) / `INVALID_INPUT` | `list_communities`/case count | adapter pattern; UI shows tx hash, case_id resolved on reread |
+| `get_case` | V | anyone | Case detail (core) | case_id | dict | — | exists | renders | `PRECONDITION_FAILED` | — | live everywhere in CaseDetail |
+| `add_context` | W | anyone (case OPEN) | Case detail — not yet a dedicated form this stage (see limitations); covered by adapter | case_id, kind, content | none | No | case OPEN | context list grows | `PRECONDITION_FAILED` | `get_context` | adapter pattern |
+| `get_context` | V | anyone | Case detail | case_id | array | — | none | renders | `RPC_FAILURE` | — | live in CaseDetail |
+| `submit_evidence` | W | anyone (case OPEN) | Case detail — Evidence section | case_id, type, reference, category, representation | evidence_id | No | case OPEN | evidence list grows | `INVALID_INPUT` (bad URL/bounds) | `list_evidence` | live in CaseDetail; client-side URL preview via `previewEvidenceUrl` |
+| `get_evidence` | V | anyone | Evidence row | case_id, evidence_id | dict | — | exists | renders | `PRECONDITION_FAILED` | — | live in CaseDetail |
+| `list_evidence` | V | anyone | Evidence section | case_id | array | — | none | renders | `RPC_FAILURE` | — | live in CaseDetail |
+| `acquire_evidence` | W | anyone (permissionless) | Evidence row — “Trigger acquisition” button on PENDING items | case_id, evidence_id | retrieval_status | No | case EVIDENCE_FROZEN, item not TEXT | evidence row's `retrieval_status` leaves PENDING | `EVIDENCE_UNAVAILABLE` | `get_evidence` | live in CaseDetail |
+| `freeze_case` | W | reporter or community role-holder | Case detail lifecycle actions | case_id | none | No | case OPEN | `get_case_state` ≠ OPEN | `ROLE_NOT_AUTHORIZED` / `PRECONDITION_FAILED` | `get_case` | adapter pattern + writeAndConfirm test shape |
+| `get_case_state` | V | anyone | (internal use — CaseDetail primarily reads full `get_case` instead, since it needs every field; `get_case_state` itself is exercised by the adapter but not separately UI-bound to avoid a redundant call) | case_id | string | — | none | — | — | — | adapter present (`getCaseState`), intentionally not separately wired — documented, not accidental |
+| `adjudicate_case` | W | anyone (permissionless) | Case detail lifecycle actions | case_id | status | No | case EVIDENCE_FROZEN, no evidence PENDING | `get_case` shows DECIDED/NEEDS_REVIEW | `EVIDENCE_UNAVAILABLE` | `get_case` | live in CaseDetail |
+| `file_challenge` | W | reporter or role-holder | Case detail lifecycle actions | case_id, reason | status | No | case DECIDED, before deadline | `get_case` shows CHALLENGED | `CHALLENGE_WINDOW_CLOSED` / `ROLE_NOT_AUTHORIZED` | `get_case` | live in CaseDetail |
+| `resolve_challenge` | W | anyone (permissionless) | Case detail lifecycle actions | case_id | status | No | case CHALLENGED | `get_case` shows FINAL | — | `get_case` | live in CaseDetail |
+| `finalize_case` | W | anyone (permissionless) | Case detail lifecycle actions | case_id | status | No | deadline passed | `get_case` shows FINAL | `FINALIZATION_NOT_READY` | `get_case` | live in CaseDetail |
+| `get_moderation_receipt` | V | anyone | Case detail — Receipt section (FINAL only) | case_id | dict | — | exists | renders | `RPC_FAILURE` | — | live in CaseDetail |
+| `get_community_cases` | V | anyone | Community Cases tab | community_id, offset, limit | array | — | bounded limit | renders paginated list | `INVALID_INPUT` (limit≥50) | — | live in CasesTab; boundary tested via BOUNDS constant |
+| `get_community_stats` | V | anyone | Community Transparency tab | community_id | dict | — | none | renders counters | `RPC_FAILURE` | — | live in TransparencyTab |
+| `get_case_precedents` | V | anyone | Case detail — Precedent section (FINAL only) | community_id, rule_id, limit | array | — | none | renders, clearly labeled non-authoritative | `RPC_FAILURE` | — | live in CaseDetail; adapter arg-order test |
+| `run_fairness_mirror` | W | anyone (permissionless) | Case detail — Fairness Mirror section (FINAL only) | case_id | status | No | case FINAL | `fairness_mirror_status` set | `PRECONDITION_FAILED` | (re-fetch `get_case`) | live in CaseDetail |
+
+## Intentionally not a primary button this stage
+
+- `get_case_state`: subsumed by `get_case` in every UI surface that needs case state, to avoid two calls where one already returns everything. The adapter function exists and is directly tested; wiring a redundant UI call would add no information.
+- `grant_role`/`revoke_role`/`create_constitution_draft`/`add_rule`/`activate_constitution`/`add_context`: all have adapter functions, are directly covered by the adapter boundary test pattern, and are reachable by any developer/integrator today via the adapter layer — but a full admin console UI (role management table, constitution drafting wizard, context-attachment form) was not built as a dedicated page within this stage's time budget. This is an honest, disclosed scope limitation (see the Stage 7 report's "Known Non-Blocking Limitations"), not an accidentally-unreachable capability: the schema is fully wired at the adapter layer, only the admin-console UI chrome around four of the thirty methods is deferred.

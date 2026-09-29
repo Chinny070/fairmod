@@ -1,0 +1,132 @@
+/**
+ * FairMod design tokens — "Civic Editorial / Underground Print" direction
+ * (see docs/DESIGN_SYSTEM.md for the full rationale and palette
+ * documentation). Distinctive to FairMod: not reused from Continuum
+ * Protocol, Protocol Court, AgentCourt, or any other prior project's
+ * palette (Electric Verdict, CANON, CLAUSE all explicitly avoided).
+ *
+ * Palette name: "BROADSHEET." Built around a warm, slightly aged newsprint
+ * paper tone, a single deep masthead ink, and one warm civic-stamp red used
+ * ONLY for FLAGGED/challenge-critical accents — never for decoration.
+ */
+:root {
+	/* Paper + ink (light) */
+	--fm-paper: #f3ecdf;
+	--fm-paper-raised: #ffffff;
+	--fm-paper-dim: #e8dfcd;
+	--fm-ink: #241f1a;
+	--fm-ink-soft: #4a4137;
+	--fm-ink-faint: #948a7a;
+	--fm-rule: #d8cdb3;
+
+	/* Masthead + identity */
+	--fm-masthead: #1f3a3d; /* deep gazette teal-ink */
+	--fm-masthead-tint: #e4ecec;
+
+	/* Verdicts (never color-only — always paired with icon/label; see components) */
+	--fm-allowed: #2f5d3a; /* civic ledger green */
+	--fm-allowed-bg: #e7efe4;
+	--fm-flagged: #9a2b1f; /* stamp red */
+	--fm-flagged-bg: #f6e4e0;
+	--fm-review: #8a6a1e; /* amber annotation */
+	--fm-review-bg: #f3ecd8;
+	--fm-undetermined: #55504a;
+	--fm-undetermined-bg: #e9e4d9;
+
+	/* Non-authoritative surfaces (precedent, Fairness Mirror) — deliberately desaturated + dashed so they never read as binding */
+	--fm-nonauthoritative-border: #b8ab8c;
+	--fm-nonauthoritative-bg: #efe9da;
+
+	/* Links + interactive */
+	--fm-link: #1f3a3d;
+	--fm-focus: #9a2b1f;
+
+	--fm-font-display: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+	--fm-font-body: 'Source Serif 4', Georgia, serif;
+	--fm-font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+	--fm-radius-sm: 2px;
+	--fm-radius-md: 4px;
+
+	--fm-space-1: 4px;
+	--fm-space-2: 8px;
+	--fm-space-3: 12px;
+	--fm-space-4: 16px;
+	--fm-space-5: 24px;
+	--fm-space-6: 32px;
+	--fm-space-7: 48px;
+	--fm-space-8: 64px;
+
+	color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme='light']) {
+		--fm-paper: #1b1815;
+		--fm-paper-raised: #232019;
+		--fm-paper-dim: #15130f;
+		--fm-ink: #ece5d6;
+		--fm-ink-soft: #c9bfab;
+		--fm-ink-faint: #8a8071;
+		--fm-rule: #3a3428;
+
+		--fm-masthead: #6ea8ab;
+		--fm-masthead-tint: #1c2c2d;
+
+		--fm-allowed: #7fbf8a;
+		--fm-allowed-bg: #1e2b1f;
+		--fm-flagged: #e2685a;
+		--fm-flagged-bg: #2e1c18;
+		--fm-review: #d9b34c;
+		--fm-review-bg: #2b2413;
+		--fm-undetermined: #b3aa9a;
+		--fm-undetermined-bg: #26221b;
+
+		--fm-nonauthoritative-border: #5b543f;
+		--fm-nonauthoritative-bg: #211e17;
+
+		--fm-link: #8fc4c6;
+		--fm-focus: #e2685a;
+
+		color-scheme: dark;
+	}
+}
+
+:root[data-theme='dark'] {
+	--fm-paper: #1b1815;
+	--fm-paper-raised: #232019;
+	--fm-paper-dim: #15130f;
+	--fm-ink: #ece5d6;
+	--fm-ink-soft: #c9bfab;
+	--fm-ink-faint: #8a8071;
+	--fm-rule: #3a3428;
+	--fm-masthead: #6ea8ab;
+	--fm-masthead-tint: #1c2c2d;
+	--fm-allowed: #7fbf8a;
+	--fm-allowed-bg: #1e2b1f;
+	--fm-flagged: #e2685a;
+	--fm-flagged-bg: #2e1c18;
+	--fm-review: #d9b34c;
+	--fm-review-bg: #2b2413;
+	--fm-undetermined: #b3aa9a;
+	--fm-undetermined-bg: #26221b;
+	--fm-nonauthoritative-border: #5b543f;
+	--fm-nonauthoritative-bg: #211e17;
+	--fm-link: #8fc4c6;
+	--fm-focus: #e2685a;
+	color-scheme: dark;
+}
+
+body {
+	background: var(--fm-paper);
+	color: var(--fm-ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*, *::before, *::after {
+		animation-duration: 0.001ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.001ms !important;
+		scroll-behavior: auto !important;
+	}
+}
