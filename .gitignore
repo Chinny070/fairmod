@@ -6,3 +6,4 @@ gltest.config.yaml
 artifacts/
 .pytest_cache/
 artifacts/
+node_modules/

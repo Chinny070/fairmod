@@ -1,0 +1,20 @@
+{
+  "name": "fairmod",
+  "version": "1.0.0",
+  "description": "Stage 0 architecture-only repository for a multi-community GenLayer moderation protocol.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "genlayer": "0.39.1"
+  }
+}
