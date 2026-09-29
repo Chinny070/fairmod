@@ -1,29 +1,8 @@
 # { "Depends": "py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6" }
-#
-# FairMod — Stage 1+2: deterministic multi-community moderation protocol core
-# plus GenLayer-native evidence acquisition and provenance.
-#
-# Stage 1 hard boundary (still true after Stage 2 additions):
-#   - No semantic verdict logic (ALLOWED/FLAGGED/NEEDS_REVIEW are NOT decided here).
-#   - No caller can force a case into DECIDED/CHALLENGE_WINDOW/CHALLENGED/FINAL —
-#     those transitions require Stage 3/4 consensus/challenge logic that does not exist yet.
-#
-# Stage 2 hard boundary (see docs/STAGE_2_VERIFICATION.md):
-#   - This module answers "what evidence did the validators actually observe?",
-#     never "does this content violate a rule?" — no rule-violation reasoning,
-#     no ALLOWED/FLAGGED output, anywhere below.
-#   - Every gl.nondet.* / gl.eq_principle call below is source-verified against
-#     the exact pinned runtime (see docs/GENVM_API_VERIFICATION.md,
-#     docs/STAGE_1_VERIFICATION.md "GenVM API generation divergence") — none
-#     of these signatures were guessed.
-#
-# GenVM header pin: matches the exact embedded-runtime build read and source-verified
-# during Stage 0/1 (see docs/GENVM_API_VERIFICATION.md) — not "latest".
 
 import hashlib
 import datetime as _dt_module
 from dataclasses import dataclass
-
 from genlayer import *
 
 # Canonical logical Rule ID format: protocol identifier, not free-form display
