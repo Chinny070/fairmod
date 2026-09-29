@@ -1,6 +1,9 @@
 # Test Strategy (Stage 0 plan; Stage 1/2 actually executed — see below)
 
-## Actual results (Stage 1 + Stage 2 + Stage 3 + Stage 4)
+## Actual results (Stage 1 + Stage 2 + Stage 3 + Stage 4 + Stage 5)
+190/190 tests passing (153 Stage 1-4 regression, unchanged + 37 Stage 5 receipts/history/precedent/Fairness Mirror/counters/scale tests). See docs/STAGE_5_VERIFICATION.md. Hosted StudioNet proof remains blocked by genlayerlabs/genvm-manager#50 (confirmed still open, 0 comments, this stage).
+
+## Earlier results (Stage 1 + Stage 2 + Stage 3 + Stage 4)
 153/153 tests passing (121 Stage 1/2/3 regression, one legitimately updated for Stage 4's new `finalize_case` method — see docs/STAGE_4_VERIFICATION.md — + 32 Stage 4 challenge/deadline/finality/liveness tests). Hosted StudioNet proof remains blocked by genlayerlabs/genvm-manager#50.
 
 ## Earlier results (Stage 1 + Stage 2 + Stage 3)

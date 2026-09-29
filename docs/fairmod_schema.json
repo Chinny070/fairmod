@@ -218,6 +218,25 @@
       "readonly": true,
       "ret": "dict"
     },
+    "get_case_precedents": {
+      "params": [
+        [
+          "community_id",
+          "string"
+        ],
+        [
+          "rule_id",
+          "string"
+        ],
+        [
+          "limit",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "array"
+    },
     "get_case_state": {
       "params": [
         [
@@ -230,6 +249,36 @@
       "ret": "string"
     },
     "get_community": {
+      "params": [
+        [
+          "community_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "dict"
+    },
+    "get_community_cases": {
+      "params": [
+        [
+          "community_id",
+          "string"
+        ],
+        [
+          "offset",
+          "int"
+        ],
+        [
+          "limit",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "array"
+    },
+    "get_community_stats": {
       "params": [
         [
           "community_id",
@@ -274,6 +323,17 @@
         ],
         [
           "evidence_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "dict"
+    },
+    "get_moderation_receipt": {
+      "params": [
+        [
+          "case_id",
           "string"
         ]
       ],
@@ -359,6 +419,18 @@
       "kwparams": {},
       "readonly": false,
       "ret": "null",
+      "payable": false
+    },
+    "run_fairness_mirror": {
+      "params": [
+        [
+          "case_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "string",
       "payable": false
     },
     "submit_evidence": {

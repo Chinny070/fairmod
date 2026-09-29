@@ -1,5 +1,8 @@
 # Adjudication Design (Stage 0; IMPLEMENTED in Stage 3)
 
+## Stage 5 update
+Fairness Mirror (`run_fairness_mirror`) is a THIRD, distinct semantic-reasoning entrypoint alongside `adjudicate_case`/`resolve_challenge` — structurally guaranteed non-authoritative (writes only to dedicated `fairness_mirror_*` fields, never to any verdict field). Precedent (`get_case_precedents`) is a pure deterministic read with no nondeterministic reasoning at all, and is never consulted by any adjudication prompt — verified by capturing the actual adjudication prompt string. See [docs/STAGE_5_VERIFICATION.md](STAGE_5_VERIFICATION.md).
+
 ## Stage 4 update
 Challenge resolution (`resolve_challenge`) asks a structurally different question than the original adjudication — see [docs/STAGE_4_VERIFICATION.md](STAGE_4_VERIFICATION.md#challenge-is-not-a-second-vote-closure-section-8). The original decision is untrusted case state, not a command to preserve; overturned Rule IDs are validated against the SAME frozen constitution version as the original decision.
 

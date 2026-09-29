@@ -1,5 +1,8 @@
 # Case State Machine (Stage 0 design; DECIDED/NEEDS_REVIEW IMPLEMENTED in Stage 3)
 
+## Stage 5 update
+No new case states — Stage 5 adds only read/composition methods and one new non-authoritative write (`run_fairness_mirror`, which never transitions `case.state`). See [docs/STAGE_5_VERIFICATION.md](STAGE_5_VERIFICATION.md).
+
 ## Stage 4 update
 `DECIDED -> CHALLENGED -> FINAL` and `DECIDED/NEEDS_REVIEW -> FINAL` (timeout) now implemented. `DECIDED` doubles as "inside its own challenge window" (a `challenge_deadline` field, not a separate state) so `adjudicate_case`'s Stage-3-tested return value never changed. No `REVIEWED` state — `resolve_challenge` moves `CHALLENGED -> FINAL` atomically. See [docs/STAGE_4_VERIFICATION.md](STAGE_4_VERIFICATION.md).
 
