@@ -520,11 +520,24 @@ def _static_schema():
 
 
 def test_no_public_method_can_force_decided_or_final(direct_deploy):
+	"""
+	Stage 1 note, updated in Stage 4: this test originally forbade a method
+	named `finalize_case` outright, because at Stage 1 no legitimate DECIDED/
+	FINAL concept existed yet and any such name could only mean an arbitrary
+	verdict-setter. Stage 4 introduces a real, permissionless, deadline-gated
+	`finalize_case(case_id)` — it advances only DECIDED-past-challenge-deadline
+	or NEEDS_REVIEW-past-review-deadline cases, accepts no verdict/state
+	parameter, and is exhaustively tested in test_stage4.py (early-finalization
+	rejection, exact deadline boundary, idempotence). Removing it from this
+	forbidden list is the disclosed, legitimate test update the Stage 4
+	closure brief anticipated — the other names remain forbidden because no
+	stage has ever introduced a caller-supplied verdict/state setter.
+	"""
 	schema = _static_schema()
 	method_names = set(schema["methods"].keys())
 	forbidden = {
 		"set_state", "force_decided", "force_final", "decide_case",
-		"finalize_case", "set_verdict", "mark_decided", "mark_final",
+		"set_verdict", "mark_decided", "mark_final",
 	}
 	assert method_names.isdisjoint(forbidden)
 

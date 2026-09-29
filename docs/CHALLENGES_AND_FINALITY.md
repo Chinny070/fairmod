@@ -1,4 +1,10 @@
-# Challenges & Finality Design (Stage 0)
+# Challenges & Finality Design (Stage 0; IMPLEMENTED in Stage 4)
+
+## Stage 4 implementation status
+Implemented in `contracts/fairmod.py`: `file_challenge`, `resolve_challenge`, `finalize_case`. 24h global challenge window and NEEDS_REVIEW review deadline (both fixed V1 constants, documented rationale in-code). Deadline boundary is exclusive-for-challenging/inclusive-for-finalizing (`now == deadline` closes the window and permits finalization). Full detail, hostile self-audit, and honest UNVERIFIED items (real GenVM time advancement, leader/validator judge step) in [docs/STAGE_4_VERIFICATION.md](STAGE_4_VERIFICATION.md).
+
+**GenLayer protocol finality is a separate layer, never conflated** — FairMod's `case.state == FINAL` means only "this application is done reasoning about this case," never "the underlying transaction reached GenVM protocol finality." See [docs/FRONTEND_INTEGRATION.md](FRONTEND_INTEGRATION.md).
+
 
 Implements Stage 4. See `STATE_MACHINE.md` for the full transition table this elaborates.
 

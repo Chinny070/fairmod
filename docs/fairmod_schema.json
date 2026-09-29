@@ -156,6 +156,34 @@
       "ret": "int",
       "payable": false
     },
+    "file_challenge": {
+      "params": [
+        [
+          "case_id",
+          "string"
+        ],
+        [
+          "reason",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "string",
+      "payable": false
+    },
+    "finalize_case": {
+      "params": [
+        [
+          "case_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "string",
+      "payable": false
+    },
     "freeze_case": {
       "params": [
         [
@@ -304,6 +332,18 @@
       "kwparams": {},
       "readonly": true,
       "ret": "array"
+    },
+    "resolve_challenge": {
+      "params": [
+        [
+          "case_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "string",
+      "payable": false
     },
     "revoke_role": {
       "params": [

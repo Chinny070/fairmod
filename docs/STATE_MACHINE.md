@@ -1,5 +1,8 @@
 # Case State Machine (Stage 0 design; DECIDED/NEEDS_REVIEW IMPLEMENTED in Stage 3)
 
+## Stage 4 update
+`DECIDED -> CHALLENGED -> FINAL` and `DECIDED/NEEDS_REVIEW -> FINAL` (timeout) now implemented. `DECIDED` doubles as "inside its own challenge window" (a `challenge_deadline` field, not a separate state) so `adjudicate_case`'s Stage-3-tested return value never changed. No `REVIEWED` state — `resolve_challenge` moves `CHALLENGED -> FINAL` atomically. See [docs/STAGE_4_VERIFICATION.md](STAGE_4_VERIFICATION.md).
+
 ## Stage 3 update
 `EVIDENCE_FROZEN -> DECIDED` (verdict ALLOWED/FLAGGED) and `EVIDENCE_FROZEN -> NEEDS_REVIEW` are now implemented via `adjudicate_case`, exactly matching this design's original transition table. Both are terminal-for-now: no method reaches `CHALLENGE_WINDOW`/`CHALLENGED`/`CHALLENGE_DECIDED`/`FINAL` yet (Stage 4). Replay-safe: adjudicating an already-`DECIDED`/`NEEDS_REVIEW` case is a no-op returning the existing status. See [docs/STAGE_3_VERIFICATION.md](STAGE_3_VERIFICATION.md).
 

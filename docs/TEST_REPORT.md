@@ -1,6 +1,9 @@
 # Test Strategy (Stage 0 plan; Stage 1/2 actually executed — see below)
 
-## Actual results (Stage 1 + Stage 2 + Stage 3)
+## Actual results (Stage 1 + Stage 2 + Stage 3 + Stage 4)
+153/153 tests passing (121 Stage 1/2/3 regression, one legitimately updated for Stage 4's new `finalize_case` method — see docs/STAGE_4_VERIFICATION.md — + 32 Stage 4 challenge/deadline/finality/liveness tests). Hosted StudioNet proof remains blocked by genlayerlabs/genvm-manager#50.
+
+## Earlier results (Stage 1 + Stage 2 + Stage 3)
 121/121 tests passing (93 Stage 1/2 regression + 28 Stage 3 semantic adjudication, mocked LLM via `gltest.direct`). See docs/STAGE_3_VERIFICATION.md. Hosted StudioNet proof remains blocked network-side by genlayerlabs/genvm-manager#50 — not attempted.
 
 ## Earlier results (Stage 1 + Stage 2)

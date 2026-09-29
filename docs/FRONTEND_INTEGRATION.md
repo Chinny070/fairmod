@@ -19,6 +19,13 @@ One typed module exporting: chain id (61999), RPC URL, deployed contract address
 ## Lifecycle states surfaced (never collapsed into a single "done")
 `signature_requested -> submitted -> pending_consensus (PROPOSING/COMMITTING/REVEALING/ACCEPTED) -> decided (isDecidedState) -> challengeable -> finalizing -> finalized (TransactionStatus.FINALIZED via waitForTransactionReceipt)`, plus `failed`/`undetermined` (`CANCELED`/`UNDETERMINED`/`VALIDATORS_TIMEOUT`/`LEADER_TIMEOUT`). A transaction hash alone only moves state to `submitted`; `finalized` is set only after `waitForTransactionReceipt` (or an equivalent reread) actually reports `TransactionStatus.FINALIZED`, matching the product spec's explicit EVM-inclusion-vs-GenLayer-finality distinction with a real SDK primitive, not a UI convention.
 
+### Stage 4 requirement: TWO independent lifecycle axes, never collapsed into one
+Stage 2H proved directly (two real StudioNet transactions) that `TransactionStatus.FINALIZED` can co-exist with `execution_result: ERROR` — GenLayer PROTOCOL finality is not GenVM execution success, and neither is FairMod APPLICATION finality. The future frontend MUST represent both axes, separately, for every case:
+
+**GenLayer transaction/protocol axis** (per write call, from `genlayer-js`): `SUBMITTED -> PENDING CONSENSUS -> EXECUTION SUCCESS | EXECUTION ERROR -> PROTOCOL FINALIZED` (via `TransactionStatus`/`isDecidedState`, unchanged from above).
+
+**FairMod application axis** (per case, from `contracts/fairmod.py`'s own `case.state`/`get_case`): `OPEN -> EVIDENCE_FROZEN -> DECIDED | NEEDS_REVIEW -> APPLICATION CHALLENGE WINDOW (challenge_deadline on a DECIDED case) -> CHALLENGED -> APPLICATION FINAL`. A case can be `case.state == "FINAL"` (application-final) while the very transaction that finalized it shows `execution_result: ERROR` if something else went wrong at the protocol layer — the UI must never render one axis's success as proof of the other's. `final_verdict` (which may be `UNDETERMINED` — a genuine, honest "never resolved" outcome, not a fifth verdict value) is the application-final outcome; `verdict` is always the original, immutable Stage 3 decision, and both must be shown, not merged.
+
 ## Safety
 Evidence/reported content rendered as text, never as executable HTML; no `dangerouslySetInnerHTML`-equivalent on untrusted fields.
 

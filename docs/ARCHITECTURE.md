@@ -56,6 +56,9 @@ The prompt assembled for `exec_prompt`/`eq_principle.prompt_comparative` must be
 ## Frontend information architecture (design system detail in a later stage doc; IA only here)
 Landing -> Communities Explorer -> Community profile -> {Rules Studio, Constitution history, New Case, Moderation history, Precedent Explorer, Transparency, Fairness Mirror, Playground} -> Case File -> {Evidence Locker, Consensus status, Challenge flow, Moderation Receipt}. Every page reads from one canonical typed chain/contract-address config; no page hardcodes an address or duplicates the ABI/schema import.
 
+## Stage 4 update
+Application-level challenges/deadlines/finality now implemented: `file_challenge`, `resolve_challenge`, `finalize_case`. FairMod application finality (`case.state == FINAL`) is explicitly distinct from GenLayer protocol-level transaction finality — see [docs/CHALLENGES_AND_FINALITY.md](CHALLENGES_AND_FINALITY.md) and [docs/STAGE_4_VERIFICATION.md](STAGE_4_VERIFICATION.md). Hosted proof remains blocked by [genvm-manager#50](https://github.com/genlayerlabs/genvm-manager/issues/50).
+
 ## Stage 3 update
 Semantic adjudication (`adjudicate_case`) is now implemented: `EVIDENCE_FROZEN -> DECIDED|NEEDS_REVIEW`, permissionless, `gl.eq_principle.prompt_comparative`-wrapped `exec_prompt` call, structured-output validation against the case's own frozen Rule IDs/evidence IDs. Hosted proof remains blocked by [genvm-manager#50](https://github.com/genlayerlabs/genvm-manager/issues/50). See [docs/STAGE_3_VERIFICATION.md](STAGE_3_VERIFICATION.md).
 

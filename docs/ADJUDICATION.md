@@ -1,5 +1,8 @@
 # Adjudication Design (Stage 0; IMPLEMENTED in Stage 3)
 
+## Stage 4 update
+Challenge resolution (`resolve_challenge`) asks a structurally different question than the original adjudication — see [docs/STAGE_4_VERIFICATION.md](STAGE_4_VERIFICATION.md#challenge-is-not-a-second-vote-closure-section-8). The original decision is untrusted case state, not a command to preserve; overturned Rule IDs are validated against the SAME frozen constitution version as the original decision.
+
 ## Stage 3 implementation status
 Implemented in `contracts/fairmod.py` (`adjudicate_case`, `_validate_candidate`, `_frozen_rule_definitions_text`, `_frozen_evidence_text`). 28 tests passing (mocked LLM via `gltest.direct`). Full detail in [docs/STAGE_3_VERIFICATION.md](STAGE_3_VERIFICATION.md), including the exact bounds, equivalence principle text, and honest UNVERIFIED items (leader/validator judge step, real hosted proof — blocked by [genvm-manager#50](https://github.com/genlayerlabs/genvm-manager/issues/50)).
 
