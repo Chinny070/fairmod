@@ -1,6 +1,12 @@
 # FairMod Frontend
 
+**Live**: [https://fairmod.vercel.app](https://fairmod.vercel.app), configured against the canonical contract `0x234ECcBDE3d265F6BF158A93e15bF5B8cCB7F450` on StudioNet.
+
 Frontend + GenLayer contract only — no backend, no centralized moderation service. The GenLayer contract (`../contracts/fairmod.py`) is the sole authoritative application state.
+
+## Production hosting
+
+Hosted on Vercel (project `chinny070s-projects/fairmod`), deployed via `vercel deploy --prod` from this directory. `vercel.json` provides the SPA rewrite (`/(.*) → /index.html`) React Router needs for direct/refreshed nested-route loads. The production `VITE_FAIRMOD_CONTRACT_ADDRESS` environment variable is set in the Vercel project's own dashboard/CLI env store (`vercel env add`), never committed to this repository.
 
 ## Stack
 

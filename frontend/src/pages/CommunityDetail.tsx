@@ -31,7 +31,13 @@ export function CommunityDetail() {
 
 	const community = useAsync<Community>(() => getCommunity(wallet.client, address, communityId), [address, communityId, wallet.client]);
 	const activeVersion = useAsync<number>(() => getActiveConstitutionVersion(wallet.client, address, communityId), [address, communityId, wallet.client]);
-	const role = useAsync(() => getRole(wallet.client, address, communityId, wallet.address ?? ''), [address, communityId, wallet.address, wallet.client]);
+	// No point issuing a doomed read (and no need to) when no wallet is
+	// connected — get_role would be called with an invalid empty-string
+	// address. Skip the RPC call entirely rather than let it fail.
+	const role = useAsync(
+		() => (wallet.address ? getRole(wallet.client, address, communityId, wallet.address) : Promise.resolve('NONE')),
+		[address, communityId, wallet.address, wallet.client],
+	);
 
 	if (!address) return <p role="status">Contract not configured.</p>;
 	if (community.status === 'loading') return <p role="status">Loading community…</p>;
