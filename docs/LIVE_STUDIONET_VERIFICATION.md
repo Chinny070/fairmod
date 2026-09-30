@@ -28,3 +28,11 @@ Following a hypothesis that the long introductory `#`-comment block between the 
 - **`get_probe()`**: returns exactly `FAIRMOD_61999_CLEANROOM_OK`
 
 This is the first fully successful StudioNet 61999 deployment in this project's history. Full detail, including what this does and does not yet establish, and next steps, in [docs/STUDIONET_61999_HEADER_BOUNDARY_FIX_RESULT.md](STUDIONET_61999_HEADER_BOUNDARY_FIX_RESULT.md). FairMod itself has **not** been deployed — only the diagnostic probe. No canonical wallet was used.
+
+## Stage 8C — Temporary FairMod deployment and full hosted E2E lifecycle (2026-09-30)
+
+Following the header-boundary fix, FairMod itself (header-corrected, hash `e6fcc870cef9f70efeb7b148e2065aff297e850bafba18ad2537a9ae52970e0d`) was deployed as a **temporary test deployment** using the disposable `my-studionet-wallet` account — transaction `0x17343f3610fe94ffc22528b849a0326f27d94bec2d1544c1a2bb6c0b8f2def5f`, address `0xB29187225636f6C43C5D9231Ab4f9cfc00907609`, `execution_result: SUCCESS`, schema/code both queryable and correct.
+
+A full application lifecycle was then exercised against this deployment: community creation, constitution draft/rule/activation, case creation with context, real TEXT/WEB_LINK/IMAGE evidence (including genuine validator-side `gl.nondet.web.get` and `gl.nondet.web.render(mode='screenshot')` + `gl.nondet.exec_prompt(images=[...])` acquisition against `https://example.com`), evidence freeze, real cross-validator semantic adjudication (verdict FLAGGED/HARASSMENT), a real application-level challenge and its independent resolution (outcome UPHOLD), receipts, precedent, transparency counters, pagination, and the Fairness Mirror (result CONSISTENT, verdict/finality fields structurally unchanged) — all reaching real consensus with `execution_result: SUCCESS`. The real frontend, pointed locally at this address, correctly rendered every piece of this state.
+
+Full transaction-by-transaction evidence in [docs/STAGE_8C_HOSTED_FAIRMOD_DEPLOYMENT.md](STAGE_8C_HOSTED_FAIRMOD_DEPLOYMENT.md). This is a **temporary test deployment, not canonical** — no canonical wallet was used or accessed.
