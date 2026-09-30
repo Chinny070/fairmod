@@ -1,5 +1,31 @@
 # FairMod — Release Manifest
 
+## Stage 9B update — CANONICAL DEPLOYMENT VERIFIED
+
+FairMod is now deployed at its **canonical production address**, manually deployed by the user via the GenLayer Studio website and independently re-verified by this session:
+
+| Field | Value |
+|---|---|
+| **Canonical contract address** | **`0x234ECcBDE3d265F6BF158A93e15bF5B8cCB7F450`** |
+| Deployment transaction | `0x22ad7f2ad5415dc2592a2e062bcb062c4723aa378425b8cdb310a6c2826dad2c` |
+| Protocol status | FINALIZED |
+| GenVM execution result | SUCCESS (Result Code: Return) |
+| Schema | PASS — exactly 30 methods (14 view, 16 write) |
+| Code match | PASS — byte-identical to `contracts/fairmod.py` (confirmed via line-ending-normalized diff) |
+| Basic read call | PASS — `list_communities()` returned `[]` on the fresh deployment |
+| Independently reconfirmed via Explorer | YES — `https://explorer-studio.genlayer.com/tx/0x22ad7f2ad5415dc2592a2e062bcb062c4723aa378425b8cdb310a6c2826dad2c` |
+
+**Production frontend configuration**: `VITE_FAIRMOD_CONTRACT_ADDRESS=0x234ECcBDE3d265F6BF158A93e15bF5B8cCB7F450` — confirmed working end-to-end against this address (typecheck/lint/tests/build all pass with it set; real reads of live canonical state rendered correctly in the frontend). Not yet set in any live hosting environment — see "Public frontend hosting" below.
+
+**Note on the deploying account**: the Explorer shows the deployment's `From` address as `0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b` — the same disposable `my-studionet-wallet` account used throughout Stage 8C testing, not a distinct address. This is stated factually for the record; it does not affect the technical verification above (ownership/administration of the deployed contract is determined by whichever address the deploying transaction's sender was, per `create_community`'s own `owner = gl.message.sender_address` logic — see `contracts/fairmod.py`).
+
+**Smoke test** (Stage 9B, against the canonical address, disposable wallet only): community creation → constitution draft/rule/activation → case creation with context and TEXT evidence → freeze → real hosted adjudication (verdict FLAGGED, rule SPAM, real generated explanation) → receipt/history reread. All steps `execution_result: SUCCESS`, all reads confirmed authoritative state. Full detail in `docs/STAGE_9B_CANONICAL_VERIFICATION.md`.
+
+**Canonical wallet used by Claude**: NO — every write above (both the earlier Stage 8C hosted campaign and this smoke test) used only the disposable `my-studionet-wallet` account. The canonical deployment transaction itself was submitted by the user, manually, through the GenLayer Studio website — Claude never accessed or requested the user's private key or seed phrase.
+
+---
+
+
 ## Release identity
 
 | Field | Value |
@@ -74,8 +100,8 @@ These are disclosed gaps in what was directly observed, not hidden failures — 
 
 ## Canonical deployment status
 
-**NOT YET PERFORMED.** No canonical address is configured anywhere in this repository. See `docs/FINAL_DEPLOYMENT.md` for the manual procedure the user will follow, and `docs/FINAL_PRODUCTION_SMOKE_TEST.md` for the post-deployment verification that must pass before any production configuration value is set.
+**PERFORMED AND VERIFIED** (Stage 9B) — see the update at the top of this document. Canonical address: `0x234ECcBDE3d265F6BF158A93e15bF5B8cCB7F450`.
 
-## Production frontend configuration (not yet set)
+## Production frontend configuration
 
-The single value that receives the canonical address, once verified, is the **`VITE_FAIRMOD_CONTRACT_ADDRESS`** environment variable (see `frontend/src/config/network.ts` and `frontend/.env.example`). It has no fallback — `getConfiguredContractAddress()` returns `''` when unset, and every read/write surface in the frontend treats an empty/invalid address as `CONTRACT_NOT_CONFIGURED` rather than substituting the Stage 8C temporary address, a mock, or a zero address (confirmed: no other file in `frontend/src` hardcodes a contract address). This value is intentionally left unset in this repository; it is set only in the production hosting environment's own configuration, after `docs/FINAL_PRODUCTION_SMOKE_TEST.md` passes.
+The single value that receives the canonical address is the **`VITE_FAIRMOD_CONTRACT_ADDRESS`** environment variable (see `frontend/src/config/network.ts` and `frontend/.env.example`). It has no fallback — `getConfiguredContractAddress()` returns `''` when unset, and every read/write surface in the frontend treats an empty/invalid address as `CONTRACT_NOT_CONFIGURED` rather than substituting the Stage 8C temporary address, a mock, or a zero address (confirmed: no other file in `frontend/src` hardcodes a contract address). Set to `0x234ECcBDE3d265F6BF158A93e15bF5B8cCB7F450` and confirmed working (typecheck/lint/tests/build all pass; a local production build correctly bakes in this address; a local dev server pointed at it correctly rendered real canonical contract state) — but **not yet set in any live public hosting environment**, since none is configured in this repository (no `vercel.json`, `netlify.toml`, CI/CD workflow, or similar exists here). Setting it in a real hosting provider's own environment configuration, once one is chosen, is the only remaining step to go live publicly.

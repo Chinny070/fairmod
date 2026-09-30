@@ -1,5 +1,11 @@
 # FairMod — Final Canonical Deployment Procedure
 
+## Stage 9B update — CANONICAL DEPLOYMENT COMPLETE
+The procedure below has been followed and the canonical deployment is verified: address `0x234ECcBDE3d265F6BF158A93e15bF5B8cCB7F450`, transaction `0x22ad7f2ad5415dc2592a2e062bcb062c4723aa378425b8cdb310a6c2826dad2c`. See `docs/STAGE_9B_CANONICAL_VERIFICATION.md` and `docs/RELEASE_MANIFEST.md` for full independent re-verification. This document is preserved as-is below as the historical record of the procedure that was followed.
+
+---
+
+
 This is the exact, minimal procedure for **you** to manually deploy the frozen FairMod contract to StudioNet 61999. Claude does not perform this step and never sees or touches your wallet's private key or seed phrase.
 
 ## What you need before starting

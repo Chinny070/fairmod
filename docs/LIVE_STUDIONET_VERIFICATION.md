@@ -36,3 +36,14 @@ Following the header-boundary fix, FairMod itself (header-corrected, hash `e6fcc
 A full application lifecycle was then exercised against this deployment: community creation, constitution draft/rule/activation, case creation with context, real TEXT/WEB_LINK/IMAGE evidence (including genuine validator-side `gl.nondet.web.get` and `gl.nondet.web.render(mode='screenshot')` + `gl.nondet.exec_prompt(images=[...])` acquisition against `https://example.com`), evidence freeze, real cross-validator semantic adjudication (verdict FLAGGED/HARASSMENT), a real application-level challenge and its independent resolution (outcome UPHOLD), receipts, precedent, transparency counters, pagination, and the Fairness Mirror (result CONSISTENT, verdict/finality fields structurally unchanged) — all reaching real consensus with `execution_result: SUCCESS`. The real frontend, pointed locally at this address, correctly rendered every piece of this state.
 
 Full transaction-by-transaction evidence in [docs/STAGE_8C_HOSTED_FAIRMOD_DEPLOYMENT.md](STAGE_8C_HOSTED_FAIRMOD_DEPLOYMENT.md). This is a **temporary test deployment, not canonical** — no canonical wallet was used or accessed.
+
+## Stage 9B — CANONICAL deployment (2026-09-30)
+
+The user manually deployed the frozen FairMod contract via the GenLayer Studio website. This session independently re-verified it:
+
+- **Canonical contract address**: `0x234ECcBDE3d265F6BF158A93e15bF5B8cCB7F450`
+- **Deployment transaction**: `0x22ad7f2ad5415dc2592a2e062bcb062c4723aa378425b8cdb310a6c2826dad2c`
+- **Protocol status**: FINALIZED — **GenVM execution result**: SUCCESS (Result Code: Return)
+- Schema (30 methods), code (byte-identical to `contracts/fairmod.py`), and a basic read call all independently reconfirmed by this session, plus cross-checked on the real Studio Explorer
+
+A small smoke test (community → constitution → case → evidence → freeze → real hosted adjudication → receipt) was then run against this canonical address using only the disposable `my-studionet-wallet` account. Full detail: [docs/STAGE_9B_CANONICAL_VERIFICATION.md](STAGE_9B_CANONICAL_VERIFICATION.md). **This is now the canonical FairMod deployment** — distinct from, and not to be confused with, the Stage 8C temporary address above. The user's canonical wallet was never accessed, used, or requested by Claude.

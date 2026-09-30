@@ -45,11 +45,11 @@ export function Layout() {
 			</main>
 			<footer className="fm-footer">
 				<p>
-					FairMod is a GenLayer Intelligent Contract. Hosted StudioNet verification is currently{' '}
+					FairMod is a GenLayer Intelligent Contract, deployed and verified live on StudioNet. See the{' '}
 					<a href="https://github.com/genlayerlabs/genvm-manager/issues/50" target="_blank" rel="noopener noreferrer nofollow">
-						blocked by genlayerlabs/genvm-manager#50
-					</a>
-					.
+						genlayerlabs/genvm-manager#50
+					</a>{' '}
+					deployment-tooling history for how an earlier source-layout issue was diagnosed and resolved.
 				</p>
 			</footer>
 		</div>
