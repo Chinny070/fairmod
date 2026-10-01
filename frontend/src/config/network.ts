@@ -4,13 +4,10 @@
  * address, chain id, or RPC anywhere else in the frontend (closes
  * THREAT_MODEL.md row #20).
  *
- * Contract address: we do NOT yet have the final canonical FairMod
- * deployment (StudioNet hosted deployment remains blocked by
- * genlayerlabs/genvm-manager#50 — see docs/STUDIONET_61999_CLEAN_PROBE_RESULT.md).
- * Reading VITE_FAIRMOD_CONTRACT_ADDRESS from the environment, with NO
- * fallback to a fake/placeholder address, is a deliberate design choice:
- * changing from a temporary test address to the final canonical address is
- * a one-line env var change, never a code change.
+ * The current canonical deployment address is supplied through
+ * VITE_FAIRMOD_CONTRACT_ADDRESS (see docs/CANONICAL_DEPLOYMENT_VERIFICATION.md).
+ * It deliberately has NO hardcoded fallback: an unset/malformed value is a
+ * configuration error, not permission to silently target another contract.
  */
 
 export const STUDIONET = {

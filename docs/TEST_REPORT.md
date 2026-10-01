@@ -1,5 +1,9 @@
 # Test Strategy (Stage 0 plan; Stage 1/2 actually executed — see below)
 
+## Current release regression (2026-10-01)
+
+`python -m pytest test/`: **200 collected, 200 passed, 0 failed, 0 skipped, 0 errors** (one Windows pytest-cache permission warning; tests all completed). Current canonical deployment and source evidence: `docs/CANONICAL_DEPLOYMENT_VERIFICATION.md`.
+
 ## Actual results (Stage 1 + Stage 2 + Stage 3 + Stage 4 + Stage 5 + Stage 6)
 192/192 tests passing (190 Stage 1-5 regression, unchanged + 2 new Stage 6 regression tests demonstrating and closing the one defect found by the Stage 6 adversarial audit — see [docs/STAGE_6_ADVERSARIAL_AUDIT.md](STAGE_6_ADVERSARIAL_AUDIT.md)). `genvm-lint` clean, schema unchanged (30 methods, byte-identical `fairmod_schema.json`). Hosted StudioNet proof remains blocked by genlayerlabs/genvm-manager#50 (reconfirmed still open, 0 comments, this stage).
 

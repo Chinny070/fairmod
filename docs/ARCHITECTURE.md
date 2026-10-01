@@ -1,5 +1,7 @@
 # FairMod Architecture (Stage 0)
 
+> Current deployment status: FairMod is deployed on StudioNet and current-canonical text-evidence lifecycle evidence is recorded in `docs/CANONICAL_DEPLOYMENT_VERIFICATION.md`. The stage-specific “hosted proof blocked” statements below describe the status at the time of those stages, not current deployment status. Hosted WEB_LINK/visual verification on the current canonical address and deliberate validator-candidate disagreement remain unverified.
+
 ## Scope discipline
 Build only: (1) one GenLayer Intelligent Contract suite, (2) a browser frontend. No Supabase/Firebase/Fly.io/centralized DB/hidden adjudicator/staking system. Network: `studionet`, chain `61999`, RPC `https://studio.genlayer.com/api`, frontend SDK `genlayer-js@1.1.8` (pinned — not latest; see TOOLCHAIN).
 
@@ -63,10 +65,10 @@ Full adversarial audit and hardening pass — no architecture change, feature-fr
 Moderation receipts, community history pagination, precedent discovery, Fairness Mirror, and transparency counters implemented — all read/composed from existing storage, no new indexes. Precedent is informative, never authoritative; Fairness Mirror is informational, never an appeal. See [docs/STAGE_5_VERIFICATION.md](STAGE_5_VERIFICATION.md).
 
 ## Stage 4 update
-Application-level challenges/deadlines/finality now implemented: `file_challenge`, `resolve_challenge`, `finalize_case`. FairMod application finality (`case.state == FINAL`) is explicitly distinct from GenLayer protocol-level transaction finality — see [docs/CHALLENGES_AND_FINALITY.md](CHALLENGES_AND_FINALITY.md) and [docs/STAGE_4_VERIFICATION.md](STAGE_4_VERIFICATION.md). Hosted proof remains blocked by [genvm-manager#50](https://github.com/genlayerlabs/genvm-manager/issues/50).
+Application-level challenges/deadlines/finality now implemented: `file_challenge`, `resolve_challenge`, `finalize_case`. FairMod application finality (`case.state == FINAL`) is explicitly distinct from GenLayer protocol-level transaction finality — see [docs/CHALLENGES_AND_FINALITY.md](CHALLENGES_AND_FINALITY.md) and [docs/STAGE_4_VERIFICATION.md](STAGE_4_VERIFICATION.md). Hosted verification at the time was blocked by [genvm-manager#50](https://github.com/genlayerlabs/genvm-manager/issues/50); current canonical deployment evidence is linked above.
 
 ## Stage 3 update
-Semantic adjudication (`adjudicate_case`) is now implemented: `EVIDENCE_FROZEN -> DECIDED|NEEDS_REVIEW`, permissionless, `gl.eq_principle.prompt_comparative`-wrapped `exec_prompt` call, structured-output validation against the case's own frozen Rule IDs/evidence IDs. Hosted proof remains blocked by [genvm-manager#50](https://github.com/genlayerlabs/genvm-manager/issues/50). See [docs/STAGE_3_VERIFICATION.md](STAGE_3_VERIFICATION.md).
+Semantic adjudication (`adjudicate_case`) is now implemented: `EVIDENCE_FROZEN -> DECIDED|NEEDS_REVIEW`, permissionless, `gl.eq_principle.prompt_comparative`-wrapped `exec_prompt` call, structured-output validation against the case's own frozen Rule IDs/evidence IDs. Hosted verification at Stage 3 was blocked by [genvm-manager#50](https://github.com/genlayerlabs/genvm-manager/issues/50). Later hosted execution is documented in the current deployment evidence and historical Stage 8C report.
 
 ## Stage 2 update
 Evidence acquisition (`acquire_evidence`) is now implemented per the conceptual flow above, using `gl.nondet.web.get()` (text route — corrected from `web.render` to expose HTTP status) and `gl.nondet.web.render(mode='screenshot')` + `gl.nondet.exec_prompt(images=[...])` (image route), both wrapped in `gl.eq_principle.prompt_comparative`. See [docs/STAGE_2_VERIFICATION.md](STAGE_2_VERIFICATION.md) for full detail, mock-test coverage, and REQUIRES_HOSTED_PROOF items. Still no semantic verdict logic anywhere in the contract.
