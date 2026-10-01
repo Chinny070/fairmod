@@ -72,5 +72,9 @@ export function normalizeError(err: unknown): FairModError {
 		return new FairModError('RPC_FAILURE', 'Could not reach the StudioNet RPC endpoint.', err);
 	}
 
+	// Falling through every known pattern is itself diagnostically useful —
+	// log the raw error so it's visible in the browser console instead of
+	// only the generic message reaching the UI.
+	console.error('FairMod: unrecognized error', err);
 	return new FairModError('UNKNOWN_PROTOCOL_ERROR', 'An unexpected error occurred.', err);
 }

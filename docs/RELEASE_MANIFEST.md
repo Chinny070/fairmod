@@ -118,3 +118,29 @@ One real frontend defect was found live and fixed during this verification: `Com
 One benign, non-blocking artifact was found and is disclosed, not silently hidden: a `GenLayer RPC error (gen_call): execution failed` appears once in the browser console on every page load, including the Home page, which makes zero contract reads. This was confirmed to originate from `genlayer-js`'s own internal, already-deprecated `initializeConsensusSmartContract()` startup path (visible as a "deprecated" warning throughout this project's CLI usage since Stage 8), not from any FairMod application code — there is no call site in `frontend/src` to fix. It does not affect functional correctness: every real FairMod read and write exercised throughout this session succeeded and rendered/behaved correctly.
 
 Live wallet-extension QA: **NOT AVAILABLE** (no browser extension connected this session, consistent with every prior stage) — not treated as a launch blocker, per instruction.
+
+## Post-launch fix — live wallet write failure (Stage 9D)
+
+After public launch, the user's own live-site usage surfaced a real write-path defect that no prior session could have caught (it only manifests with a genuine browser wallet extension, which was unavailable in every automated verification pass): every write (starting with `create_community`) failed instantly, with no wallet signature prompt ever appearing, and the frontend surfaced only its generic `UNKNOWN_PROTOCOL_ERROR` message.
+
+**Root cause**: `createWalletClient` (`frontend/src/adapter/client.ts`) constructed the `genlayer-js` wallet client from the injected EIP-1193 `provider` alone. `genlayer-js@1.1.8`'s `ClientConfig` requires `account` as a separate, explicit field — it is not derived from `provider`. Without it, `writeContract` throws `"No account set. Configure the client with an account or pass an account to this function."` synchronously, before ever reaching the wallet — explaining why no MetaMask popup appeared.
+
+**Diagnosis aid added**: `normalizeError()` (`frontend/src/domain/errors.ts`) previously discarded the raw error once it fell through every known pattern to `UNKNOWN_PROTOCOL_ERROR`, leaving nothing in the console to debug from. It now `console.error`s the raw error before returning the generic `FairModError`, which is what surfaced the real message above.
+
+**Fix**: `createWalletClient` now takes the connected account explicitly and passes it through to `createClient`; both the initial `connect()` path and the `accountsChanged` listener in `useWallet.ts` rebuild the client with the current account. Verified live: after redeploying, `create_community("Riverside Forum", ...)` reached `FINALIZED` / `execution_result: SUCCESS` (tx `0x89114ac63e16f52406ecaccf760c72b900820e864fd6c7325a07f948048d6de7`, returned `"c1"`), the frontend correctly showed the new community and recognized the connecting wallet as its `OWNER`.
+
+## Post-launch fix — premature draft reread after `add_rule` (Stage 9D, continued)
+
+Continued live usage (drafting a constitution for "Riverside Forum") surfaced a second real defect: after `add_rule` was submitted and reached `FINALIZED`/`execution_result: SUCCESS` on-chain (tx `0x750356e53d3bd3b12a96d2a21caceeaded1c0d14f09d177b4f38f878ec38cfd3`), the Constitution Authoring UI still showed "Status: DRAFT — 0 rules", leaving "Activate" incorrectly disabled.
+
+**Root cause**: `AddRuleForm`'s submit handler (`frontend/src/pages/community/ConstitutionAuthoringTab.tsx`) called the raw `addRule()` adapter function, which only awaits `writeContract`'s own promise — resolved once a transaction hash exists, not once the transaction is finalized — then immediately called `onAdded()` to reread the draft. The reread raced ahead of on-chain finalization and returned the pre-write state.
+
+**Fix**: `AddRuleForm` now goes through the same `writeAndConfirm` pipeline every other write in this app uses — it waits for the transaction to reach `FINALIZED` and confirms the new rule ID is actually present in a fresh `getConstitution` read before calling `onAdded()`. A full frontend gate rerun (66/66 tests, typecheck/lint/build) passed; redeployed to `https://fairmod.vercel.app`.
+
+## Post-launch fix — case-id URL fragment collision (Stage 9D, continued)
+
+After activating the constitution and creating a real case (`create_case` → tx `0x4c9e6aa834db7227d5c6405e578d81ead6f63e4ff853f9bd15b373d65ccd4829`, `FINALIZED`/`SUCCESS`, returned case id `"c1#0"`), clicking into it from the Cases tab immediately produced `"An unexpected error occurred."` on the case detail page.
+
+**Root cause**: FairMod's case ids are composite strings of the form `"<communityId>#<index>"` (e.g. `"c1#0"`). The Cases tab's link (`frontend/src/pages/CommunityDetail.tsx`) built `` `/cases/${c.case_id}` `` unencoded — `#` is the URL fragment delimiter, so both the rendered `<a href>` and React Router's `<Link>` parsed `/cases/c1#0` as pathname `/cases/c1` plus hash `#0`. `CaseDetail`'s `useParams()` therefore only ever received `caseId = "c1"`, a nonexistent case, and every read (`getCase`, `getContext`, `listEvidence`) threw, surfacing the generic fallback message.
+
+**Fix**: the link now URL-encodes the case id (`encodeURIComponent(c.case_id)`, `c1%230`); React Router's `useParams()` decodes it back to the correct `"c1#0"` automatically, requiring no change on `CaseDetail`'s side. Confirmed this was the only call site constructing a `/cases/:caseId` link. Frontend gate rerun (66/66 tests) passed; redeployed to `https://fairmod.vercel.app`.

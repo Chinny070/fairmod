@@ -206,7 +206,11 @@ function CasesTab({ communityId, address, client, page, setPage, pageSize }: { c
 			<ul className="fm-case-list">
 				{cases.data.map((c) => (
 					<li key={c.case_id}>
-						<Link to={`/cases/${c.case_id}`}>
+						{/* Case IDs contain "#" (e.g. "c1#0"), which is the URL fragment
+						delimiter — an unencoded link would have the browser/router
+						treat everything after "#" as a hash, not part of the path,
+						truncating the actual case id that reaches CaseDetail. */}
+						<Link to={`/cases/${encodeURIComponent(c.case_id)}`}>
 							<span className="fm-case-list__id">{c.case_id}</span>
 							<VerdictBadge value={c.final_verdict || c.verdict} />
 							<span className="fm-case-list__state">{c.state}</span>

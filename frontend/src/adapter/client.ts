@@ -43,9 +43,13 @@ export function createReadClient(): GenLayerClient<typeof chains.studionet> {
 /**
  * Creates a wallet-aware client from an injected EIP-1193 provider. Never
  * requests or stores a private key — the provider itself performs signing.
+ * `account` must be passed explicitly: genlayer-js's writeContract does not
+ * derive it from `provider` alone (confirmed against the installed
+ * genlayer-js@1.1.8 ClientConfig type) — without it every write fails
+ * immediately with "No account set.", before the wallet is ever prompted.
  */
-export function createWalletClient(provider: EthereumProvider): GenLayerClient<typeof chains.studionet> {
-	return createClient({ chain: chains.studionet, provider }) as GenLayerClient<typeof chains.studionet>;
+export function createWalletClient(provider: EthereumProvider, account: `0x${string}`): GenLayerClient<typeof chains.studionet> {
+	return createClient({ chain: chains.studionet, provider, account }) as GenLayerClient<typeof chains.studionet>;
 }
 
 /** Reads the connected chain id directly from the injected provider (EIP-1193 eth_chainId), independent of what the client was constructed with. */

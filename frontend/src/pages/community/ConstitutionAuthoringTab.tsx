@@ -144,15 +144,27 @@ function AddRuleForm({ communityId, address, version, onAdded }: { communityId: 
 		setBusy(true);
 		setError(undefined);
 		try {
-			await addRule(wallet.client, address, communityId, version, {
-				ruleId,
-				title,
-				definition,
-				category: '',
-				exceptions: [],
-				contextRequired: false,
-				evidencePolicy: '',
-			});
+			const pendingRuleId = ruleId;
+			// Wait for the write to actually finalize before rereading the
+			// draft — a submitted tx hash is not proof the rule is on-chain
+			// yet, and rereading too early showed a stale "0 rules" draft
+			// even after a successful add_rule (confirmed live on
+			// StudioNet: reread raced ahead of finalization).
+			await writeAndConfirm(
+				wallet.client,
+				() =>
+					addRule(wallet.client, address, communityId, version, {
+						ruleId,
+						title,
+						definition,
+						category: '',
+						exceptions: [],
+						contextRequired: false,
+						evidencePolicy: '',
+					}),
+				() => getConstitution(wallet.client, address, communityId, version),
+				(c) => pendingRuleId in c.rules,
+			);
 			setRuleId('');
 			setTitle('');
 			setDefinition('');

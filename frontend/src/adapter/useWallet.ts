@@ -52,9 +52,10 @@ export function useWallet(): WalletState {
 			if (!accounts || accounts.length === 0) {
 				throw new FairModError('WALLET_REJECTED', 'No account was authorized.');
 			}
-			setAddress(accounts[0] as `0x${string}`);
+			const account = accounts[0] as `0x${string}`;
+			setAddress(account);
 			setProvider(injected);
-			setClient(createWalletClient(injected));
+			setClient(createWalletClient(injected, account));
 			await refreshChainId(injected);
 		} catch (err) {
 			setStatus('disconnected');
@@ -77,7 +78,9 @@ export function useWallet(): WalletState {
 			if (!accounts || accounts.length === 0) {
 				disconnect();
 			} else {
-				setAddress(accounts[0] as `0x${string}`);
+				const account = accounts[0] as `0x${string}`;
+				setAddress(account);
+				setClient(createWalletClient(provider, account));
 			}
 		};
 		const onChainChanged = () => {
