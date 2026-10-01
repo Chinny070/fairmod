@@ -1,5 +1,7 @@
 # Stage 9B — Canonical Deployment Verification
 
+> Historical record: this verified the then-current address `0x234ECcBDE3d265F6BF158A93e15bF5B8cCB7F450`. That deployment is superseded. The current canonical deployment is `0xad3C8BF5FCE573A9dB2f0c857e8c303aDFBB771f`; see `docs/CANONICAL_DEPLOYMENT_VERIFICATION.md`. The checks below remain evidence for the earlier deployment only.
+
 The user manually deployed the frozen FairMod contract via the GenLayer Studio website, following `docs/FINAL_DEPLOYMENT.md`. This document is this session's **independent** re-verification of that deployment, plus a small smoke test — not a repeat of the full Stage 8 adversarial campaign (those properties were already established against the Stage 8C temporary deployment; see `docs/STAGE_8_HOSTED_STUDIONET_TEST_PLAN.md` and `docs/STAGE_8C_HOSTED_FAIRMOD_DEPLOYMENT.md`).
 
 ## 1. Independent deployment verification

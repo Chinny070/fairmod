@@ -4,7 +4,7 @@
 
 This is a targeted hardening pass for the existing `adjudicate_case` nondeterministic consensus boundary. It does not change FairMod's public schema, storage, role model, evidence model, state machine, prompts for adjudication, or decision outcomes.
 
-The hardened source SHA-256 is `2ad077c7970b8ef09c3a1ba6ed5744e3c1ad4f68b56562c9f21f298de8e0c5be`. It was prepared from repository commit `dd87506122a54078c7105208d85c7ec73105361b`; the hardening commit is recorded in the repository history with this document.
+The hardened source SHA-256 is `2ad077c7970b8ef09c3a1ba6ed5744e3c1ad4f68b56562c9f21f298de8e0c5be`. The contract change was committed at `0cc4d30b7ce5ad309c6839850c7844f45eb39cfa`; the repository release containing the current frontend is `7d89fa0ea682183d1c8ea4db047f801c19ac09a6`. The hardened source is deployed at the current canonical address; see `docs/CANONICAL_DEPLOYMENT_VERIFICATION.md`.
 
 ## Actual execution path
 

@@ -1,7 +1,10 @@
 # FairMod — Final Canonical Deployment Procedure
 
-## Stage 9B update — CANONICAL DEPLOYMENT COMPLETE
-The procedure below has been followed and the canonical deployment is verified: address `0x234ECcBDE3d265F6BF158A93e15bF5B8cCB7F450`, transaction `0x22ad7f2ad5415dc2592a2e062bcb062c4723aa378425b8cdb310a6c2826dad2c`. See `docs/STAGE_9B_CANONICAL_VERIFICATION.md` and `docs/RELEASE_MANIFEST.md` for full independent re-verification. This document is preserved as-is below as the historical record of the procedure that was followed.
+## Current status — canonical deployment verified
+
+The current canonical deployment is `0xad3C8BF5FCE573A9dB2f0c857e8c303aDFBB771f`, deployed in transaction `0x3bde02c3690c03175a7601622c8b0cd82851a24031d5fcb40e48a223de7647ad`. Its deployed source matches the repository contract after newline normalization. The former `0x234ECcBDE3d265F6BF158A93e15bF5B8cCB7F450` is a previous deployment and is superseded. See `docs/CANONICAL_DEPLOYMENT_VERIFICATION.md` for evidence. The procedure below is an archived manual-deployment guide for the earlier `e6fcc…` source and old deployment flow. Do not follow it or redeploy from it.
+
+The historical steps below intentionally retain the old expected hash and old deployment workflow as an audit trail only; they are not instructions for the current deployment.
 
 ---
 

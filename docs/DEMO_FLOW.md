@@ -1,6 +1,6 @@
-# FairMod Demo / Reviewer Flow (prepared for when StudioNet hosting unblocks)
+# FairMod Demo / Reviewer Flow
 
-This is a prepared sequence, not a record of results. No step below has been run against a real StudioNet deployment — that remains blocked by `genlayerlabs/genvm-manager#50` (see `docs/STUDIONET_61999_CLEAN_PROBE_RESULT.md`, `docs/STAGE_8_HOSTED_STUDIONET_TEST_PLAN.md`). Every claim of "works" in this document today refers only to local Direct Mode (`gltest.direct`) or mocked-adapter frontend verification, never real GenLayer consensus.
+The text-evidence lifecycle through challenge resolution has now been exercised against the current canonical StudioNet deployment, and a fresh authoritative reread confirmed case `c0#0` is `FINAL`. The historical issue #50 invalid-contract failures were followed by successful deployment after correcting the Depends-header boundary. See `docs/CANONICAL_DEPLOYMENT_VERIFICATION.md` for transaction-level evidence. Web/image evidence and deliberately divergent leader/validator candidates were not rerun against the current canonical address in this pass; the earlier Stage 8C web/visual evidence belongs to its explicitly temporary test deployment.
 
 ## Why this demo needs GenLayer at all
 
@@ -24,13 +24,13 @@ The point to make concrete, not just assert: a keyword filter or a single centra
 14. **Show precedent (informational).** `get_case_precedents` for the same rule — narrate explicitly that this is shown for context only and is never read by any adjudication prompt.
 15. **Run the Fairness Mirror.** `run_fairness_mirror` — narrate that this is a separate, non-authoritative consistency check that structurally cannot change the verdict, and show it rendered visually distinct from the binding decision in the frontend.
 
-## Demo prerequisites (once hosted deployment is unblocked)
+## Further demo prerequisites
 
-- A temporary FairMod deployment at a known address, `VITE_FAIRMOD_CONTRACT_ADDRESS` pointed at it.
+- A currently queryable FairMod deployment; production currently points at the canonical address in `docs/CANONICAL_DEPLOYMENT_VERIFICATION.md`.
 - A disposable wallet with StudioNet GEN, connected via the frontend (not the CLI, for the demo itself).
 - At least one real, reachable public URL prepared in advance for the WEB_LINK evidence step, and ideally one image-bearing page for the visual-evidence step.
 - Enough real elapsed time (or a legitimately long demo session) to show the 24h challenge-window boundary honestly, or an explicit narrated skip of that step with the boundary behavior described from the existing Direct Mode test coverage instead.
 
-## What this document is not
+## Evidence boundary
 
-Not a script that has been run. Not a claim that any step above currently works against real StudioNet consensus. Every "works" claim in this repository about the moderation lifecycle beyond this point is backed only by Direct Mode (`gltest.direct`) tests — real, but local and mocked at the nondeterministic-call boundary, per every prior stage's own disclosure.
+The full sequence above is a demo plan, not a claim that every item was run against the current canonical address. Specifically, current-canonical live evidence covers the text-evidence moderation/challenge/finality/receipt/Fairness Mirror lifecycle; hosted web and visual acquisition evidence remains associated only with the separate Stage 8C temporary test deployment.

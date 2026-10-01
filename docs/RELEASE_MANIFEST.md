@@ -1,12 +1,33 @@
 # FairMod — Release Manifest
 
-## Stage 9B update — CANONICAL DEPLOYMENT VERIFIED
+## Current release — canonical deployment and lifecycle verified (2026-10-01)
 
-FairMod is now deployed at its **canonical production address**, manually deployed by the user via the GenLayer Studio website and independently re-verified by this session:
+| Field | Verified value |
+|---|---|
+| Current repository release commit | `7d89fa0ea682183d1c8ea4db047f801c19ac09a6` |
+| Contract source commit | `0cc4d30b7ce5ad309c6839850c7844f45eb39cfa` |
+| Contract source | `contracts/fairmod.py` |
+| Local source SHA-256 | `2ad077c7970b8ef09c3a1ba6ed5744e3c1ad4f68b56562c9f21f298de8e0c5be` |
+| Current canonical StudioNet address | `0xad3C8BF5FCE573A9dB2f0c857e8c303aDFBB771f` |
+| Deployment transaction | `0x3bde02c3690c03175a7601622c8b0cd82851a24031d5fcb40e48a223de7647ad` |
+| Protocol status / GenVM execution | FINALIZED / SUCCESS (Explorer deployment record) |
+| Deployed source comparison | PASS — live `getContractCode` source equals local source after CRLF/LF normalization |
+| Deployed schema | PASS — 30 methods, 14 view / 16 write |
+| Representative live application state | PASS — community `c0`, case `c0#0`, state FINAL, verdict FLAGGED, challenge UPHOLD, Fairness Mirror CONSISTENT; fresh authoritative reads confirmed |
+| Production frontend address | `VITE_FAIRMOD_CONTRACT_ADDRESS` is present in Vercel Production; public production bundle contains current address and not the superseded or temporary address |
+| Network / chain / RPC | StudioNet / `61999` / `https://studio.genlayer.com/api` |
+
+Current local gate: contract tests **200 passed / 0 failed**; frontend tests **66 passed / 0 failed**; TypeScript PASS; ESLint PASS (0 errors, 1 warning); production build PASS. The test suite and build details are also recorded in `docs/CANONICAL_DEPLOYMENT_VERIFICATION.md`.
+
+Full evidence and lifecycle transactions: `docs/CANONICAL_DEPLOYMENT_VERIFICATION.md`.
+
+## Historical Stage 9B deployment — superseded
+
+This section records the earlier deployment, not the current canonical deployment. Address `0x234ECcBDE3d265F6BF158A93e15bF5B8cCB7F450` has been superseded by the current deployment above. The original observations below remain historical evidence for that earlier contract/source.
 
 | Field | Value |
 |---|---|
-| **Canonical contract address** | **`0x234ECcBDE3d265F6BF158A93e15bF5B8cCB7F450`** |
+| Previous deployment address (superseded) | `0x234ECcBDE3d265F6BF158A93e15bF5B8cCB7F450` |
 | Deployment transaction | `0x22ad7f2ad5415dc2592a2e062bcb062c4723aa378425b8cdb310a6c2826dad2c` |
 | Protocol status | FINALIZED |
 | GenVM execution result | SUCCESS (Result Code: Return) |
@@ -15,7 +36,7 @@ FairMod is now deployed at its **canonical production address**, manually deploy
 | Basic read call | PASS — `list_communities()` returned `[]` on the fresh deployment |
 | Independently reconfirmed via Explorer | YES — `https://explorer-studio.genlayer.com/tx/0x22ad7f2ad5415dc2592a2e062bcb062c4723aa378425b8cdb310a6c2826dad2c` |
 
-**Production frontend configuration**: `VITE_FAIRMOD_CONTRACT_ADDRESS=0x234ECcBDE3d265F6BF158A93e15bF5B8cCB7F450` — confirmed working end-to-end against this address (typecheck/lint/tests/build all pass with it set; real reads of live canonical state rendered correctly in the frontend). Not yet set in any live hosting environment — see "Public frontend hosting" below.
+The production environment now points to `0xad3C8BF5FCE573A9dB2f0c857e8c303aDFBB771f`. This historical deployment's frontend configuration is not current.
 
 **Note on the deploying account**: the Explorer shows the deployment's `From` address as `0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b` — the same disposable `my-studionet-wallet` account used throughout Stage 8C testing, not a distinct address. This is stated factually for the record; it does not affect the technical verification above (ownership/administration of the deployed contract is determined by whichever address the deploying transaction's sender was, per `create_community`'s own `owner = gl.message.sender_address` logic — see `contracts/fairmod.py`).
 
@@ -26,7 +47,7 @@ FairMod is now deployed at its **canonical production address**, manually deploy
 ---
 
 
-## Release identity
+## Stage 8C release identity (historical)
 
 | Field | Value |
 |---|---|
@@ -46,7 +67,7 @@ FairMod is now deployed at its **canonical production address**, manually deploy
 
 | Check | Result |
 |---|---|
-| Contract tests | 195 passed / 0 failed |
+| Contract tests at that stage | 195 passed / 0 failed |
 | Frontend tests | 66 passed / 0 failed |
 | Public schema methods | 30 (14 view, 16 write) |
 | GenVM lint | PASS |
@@ -62,7 +83,7 @@ FairMod is now deployed at its **canonical production address**, manually deploy
 | Address | `0xB29187225636f6C43C5D9231Ab4f9cfc00907609` |
 | Status | FINALIZED, `execution_result: SUCCESS` |
 
-**This address must never be used as the production configuration value.** It exists only as the record of the hosted verification described below. A separate, distinct canonical deployment (performed manually by the user per `docs/FINAL_DEPLOYMENT.md`) supplies the real production address.
+**This address must never be used as the production configuration value.** It remains a test deployment only; current production uses the canonical address in the current-release table above.
 
 ## Hosted capabilities verified (Stage 8C, against the temporary deployment above)
 
@@ -100,11 +121,11 @@ These are disclosed gaps in what was directly observed, not hidden failures — 
 
 ## Canonical deployment status
 
-**PERFORMED AND VERIFIED** (Stage 9B) — see the update at the top of this document. Canonical address: `0x234ECcBDE3d265F6BF158A93e15bF5B8cCB7F450`.
+**PERFORMED AND VERIFIED** — current canonical address: `0xad3C8BF5FCE573A9dB2f0c857e8c303aDFBB771f`; deployment transaction: `0x3bde02c3690c03175a7601622c8b0cd82851a24031d5fcb40e48a223de7647ad`. The earlier Stage 9B deployment at `0x234…F450` is superseded.
 
 ## Production frontend configuration
 
-The single value that receives the canonical address is the **`VITE_FAIRMOD_CONTRACT_ADDRESS`** environment variable (see `frontend/src/config/network.ts` and `frontend/.env.example`). It has no fallback — `getConfiguredContractAddress()` returns `''` when unset, and every read/write surface in the frontend treats an empty/invalid address as `CONTRACT_NOT_CONFIGURED` rather than substituting the Stage 8C temporary address, a mock, or a zero address (confirmed: no other file in `frontend/src` hardcodes a contract address; confirmed absent from the deployed production JS bundle via direct fetch/grep).
+The single value that receives the canonical address is **`VITE_FAIRMOD_CONTRACT_ADDRESS`** (see `frontend/src/config/network.ts` and `frontend/.env.example`). Vercel Production has this variable configured; its value is encrypted in Vercel. The public production JS bundle was fetched and verified to contain the current canonical address and not contain the earlier `0x234…F450` or Stage 8C temporary address. There is no hardcoded fallback: when unset locally, reads/writes refuse with `CONTRACT_NOT_CONFIGURED`.
 
 ## Public launch (Stage 9C)
 

@@ -9,7 +9,7 @@ All 30/30 methods are now intentionally represented through usable UI, not just 
 
 `get_case_state` remains the one method still reached only through the adapter rather than a separate UI control — see the table row below for why that is a deliberate, documented choice (every UI surface that needs case state already has the full `get_case` dict, so a second, narrower call would add a redundant network round trip with no new information).
 
-All 30 public methods from `docs/fairmod_schema.json` (Stage 6 hash `417cf3de5fef4e6e3a28c0d63510771f18e923dcf42a1f94295a1dc7d3c72d36`), each accounted for.
+All 30 public methods from `docs/fairmod_schema.json` (current deployed contract source SHA-256 `2ad077c7970b8ef09c3a1ba6ed5744e3c1ad4f68b56562c9f21f298de8e0c5be`), each accounted for. Method signatures remain compatible with the deployed 30-method schema.
 
 | Method | V/W | Who can call (contract-enforced) | UI surface | Inputs | Output | Payable | Preconditions | Success state | Error state | Post-write reread | Test coverage |
 |---|---|---|---|---|---|---|---|---|---|---|---|

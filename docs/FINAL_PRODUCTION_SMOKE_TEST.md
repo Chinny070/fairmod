@@ -1,6 +1,10 @@
 # FairMod — Final Production Smoke Test
 
-Run this **once**, after the canonical deployment is confirmed (per `docs/FINAL_DEPLOYMENT.md`, section 11-12) and its address has been set in production configuration. This is deliberately much smaller than the Stage 8 adversarial campaign — Stage 8 already established isolation, authorization, structured-output validation, replay-safety, and every other correctness property against a real hosted deployment (see `docs/STAGE_8_HOSTED_STUDIONET_TEST_PLAN.md` and `docs/STAGE_8C_HOSTED_FAIRMOD_DEPLOYMENT.md`). This smoke test exists only to confirm the *canonical* address is genuinely the same working contract, not to re-prove properties already proven.
+> Historical smoke-test procedure: current canonical verification is complete. Do not run this checklist as a new write campaign. Current address, exact source comparison, and authoritative lifecycle readback are documented in `docs/CANONICAL_DEPLOYMENT_VERIFICATION.md`.
+
+Current canonical address: `0xad3C8BF5FCE573A9dB2f0c857e8c303aDFBB771f`.
+Current deployed source SHA-256: `2ad077c7970b8ef09c3a1ba6ed5744e3c1ad4f68b56562c9f21f298de8e0c5be`.
+Current deployment transaction: `0x3bde02c3690c03175a7601622c8b0cd82851a24031d5fcb40e48a223de7647ad`.
 
 For every write below: submit → wait for `FINALIZED` → confirm `execution_result: SUCCESS` → **re-read** authoritative state independently. Never treat a transaction hash or "FINALIZED" alone as success (this is not optional — see `docs/STAGE_8C_HOSTED_FAIRMOD_DEPLOYMENT.md` for why).
 
@@ -10,14 +14,14 @@ For every write below: submit → wait for `FINALIZED` → confirm `execution_re
 ./node_modules/.bin/genlayer schema <canonical address>
 ./node_modules/.bin/genlayer code <canonical address>
 ```
-Expect: schema lists 30 methods (14 view, 16 write); code matches `contracts/fairmod.py` exactly (hash `e6fcc870cef9f70efeb7b148e2065aff297e850bafba18ad2537a9ae52970e0d`).
+Expect: schema lists 30 methods (14 view, 16 write); returned code matches `contracts/fairmod.py` after newline normalization (local file SHA-256 above).
 
 ## 2. Public read path
 
 ```bash
 ./node_modules/.bin/genlayer call <canonical address> list_communities
 ```
-Expect: `[]` (empty — nothing has been created on this fresh deployment yet).
+Current readback is populated: community `c0`, case `c0#0`; see the verification record for current values.
 
 ## 3. Community creation
 

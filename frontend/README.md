@@ -1,6 +1,6 @@
 # FairMod Frontend
 
-**Live**: [https://fairmod.vercel.app](https://fairmod.vercel.app), configured against the canonical contract `0x234ECcBDE3d265F6BF158A93e15bF5B8cCB7F450` on StudioNet.
+**Live**: [https://fairmod.vercel.app](https://fairmod.vercel.app), configured against the canonical contract `0xad3C8BF5FCE573A9dB2f0c857e8c303aDFBB771f` on StudioNet.
 
 Frontend + GenLayer contract only — no backend, no centralized moderation service. The GenLayer contract (`../contracts/fairmod.py`) is the sole authoritative application state.
 
@@ -20,7 +20,7 @@ Hosted on Vercel (project `chinny070s-projects/fairmod`), deployed via `vercel d
 ```bash
 cd frontend
 npm install
-cp .env.example .env.local   # then set VITE_FAIRMOD_CONTRACT_ADDRESS once a real deployment exists
+cp .env.example .env.local   # optionally set VITE_FAIRMOD_CONTRACT_ADDRESS for local live reads
 npm run dev
 ```
 
@@ -28,7 +28,7 @@ npm run dev
 
 | Variable | Purpose | Default |
 |---|---|---|
-| `VITE_FAIRMOD_CONTRACT_ADDRESS` | The deployed FairMod contract address on StudioNet. Empty until a real deployment exists — the app refuses reads/writes rather than fabricating a fallback address (`src/config/network.ts`). | unset |
+| `VITE_FAIRMOD_CONTRACT_ADDRESS` | The deployed FairMod contract address on StudioNet. Production points to the verified canonical deployment; local environments may leave it unset, in which case the app refuses reads/writes rather than fabricating a fallback (`src/config/network.ts`). | unset locally |
 | `VITE_FAIRMOD_DEV_MODE` | Gates development-only fixture data paths (`src/dev/fixtures.ts`). Must remain unset/false in any production build. | `false` |
 
 Changing which contract address the app talks to is a **one-line environment variable change** — nothing else in the codebase hardcodes an address (`src/config/network.ts` is the single source of truth, imported everywhere an address or Explorer link is needed).
@@ -37,7 +37,7 @@ Changing which contract address the app talks to is a **one-line environment var
 
 Network: StudioNet · Chain ID `61999` · RPC `https://studio.genlayer.com/api` · Currency `GEN`. See `src/config/network.ts`.
 
-**Hosted deployment status**: FairMod itself is not yet deployed to StudioNet. Hosted deployment is blocked by [genlayerlabs/genvm-manager#50](https://github.com/genlayerlabs/genvm-manager/issues/50) — every deployment attempt of the pinned runner (including a from-scratch minimal probe under a fully cleaned local toolchain) reaches protocol `FINALIZED` but GenVM execution reports `invalid_contract`. See `../docs/STUDIONET_61999_CLEAN_PROBE_RESULT.md` for the full evidence. This frontend is built and tested against the contract's schema and mocked SDK boundary, not against a live deployment — see `../docs/FRONTEND_HOSTED_VERIFICATION_MATRIX.md`.
+**Hosted deployment status**: FairMod is deployed and verified on StudioNet. The production bundle was checked and contains `0xad3C8BF5FCE573A9dB2f0c857e8c303aDFBB771f`; no hardcoded fallback is used. Current deployment and lifecycle evidence: `../docs/CANONICAL_DEPLOYMENT_VERIFICATION.md`. The earlier `invalid_contract` issue #50 is historical context; the header-boundary correction preceded successful probe and FairMod deployments.
 
 ## Wallet behavior
 
@@ -81,12 +81,10 @@ Two chunks: app code (~213kB/67kB gzip) and a `genlayer-vendor` chunk (~535kB/11
 
 `src/dev/fixtures.ts` contains deterministic fixture data for visual/component development. It is imported by **no** production code path (`src/adapter`, `src/pages`, `src/config`) — grep for `dev/fixtures` to confirm before any release. `VITE_FAIRMOD_DEV_MODE` exists as an explicit, isolated gate for any future dev-only UI affordance; no current page reads it to alter production behavior.
 
-## Issue #50 hosted-testing blocker
+## Historical StudioNet deployment issue
 
-Do not attempt to work around `genlayerlabs/genvm-manager#50` by switching tooling generations, runners, or networks in this frontend. If maintainers respond with a suggested fix, it is tested against the minimal clean probe first (`../diagnostics/studionet_61999_clean_probe.py`), not against this frontend directly.
+The prior `invalid_contract` reports tracked under `genlayerlabs/genvm-manager#50` are historical. Successful probe and current FairMod deployments followed correction of the Depends-header boundary. Do not change the stable runner or network without a separately verified reason; current hosted evidence is in `../docs/CANONICAL_DEPLOYMENT_VERIFICATION.md`.
 
-## Final deployment-address replacement procedure
+## Updating the production contract address
 
-1. Deploy the exact frozen, accepted `contracts/fairmod.py` source (hash must match the recorded release-candidate hash).
-2. Set `VITE_FAIRMOD_CONTRACT_ADDRESS` in the production environment to the resulting address.
-3. Redeploy the frontend. No code change is required.
+Production currently points at the canonical contract listed at the top of this README. Only for a separately authorized future deployment, set `VITE_FAIRMOD_CONTRACT_ADDRESS` in Vercel Production to that deployment's independently verified address and redeploy the frontend; no source fallback or code change is needed.

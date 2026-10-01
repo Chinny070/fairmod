@@ -3,7 +3,7 @@
 A multi-community moderation protocol built entirely as a [GenLayer](https://genlayer.com) Intelligent Contract, with a companion web frontend.
 
 **Live**: [https://fairmod.vercel.app](https://fairmod.vercel.app)
-**Canonical contract**: [`0x234ECcBDE3d265F6BF158A93e15bF5B8cCB7F450`](https://explorer-studio.genlayer.com/address/0x234ECcBDE3d265F6BF158A93e15bF5B8cCB7F450) on GenLayer StudioNet (chain ID `61999`)
+**Canonical contract**: [`0xad3C8BF5FCE573A9dB2f0c857e8c303aDFBB771f`](https://explorer-studio.genlayer.com/address/0xad3C8BF5FCE573A9dB2f0c857e8c303aDFBB771f) on GenLayer StudioNet (chain ID `61999`)
 
 ## What FairMod is
 
@@ -34,21 +34,24 @@ Full design/verification detail lives in `docs/` — see `docs/ARCHITECTURE.md`,
 | Field | Value |
 |---|---|
 | Contract | `contracts/fairmod.py` |
-| SHA-256 | `e6fcc870cef9f70efeb7b148e2065aff297e850bafba18ad2537a9ae52970e0d` |
-| Address | `0x234ECcBDE3d265F6BF158A93e15bF5B8cCB7F450` |
-| Deployment tx | `0x22ad7f2ad5415dc2592a2e062bcb062c4723aa378425b8cdb310a6c2826dad2c` |
+| SHA-256 | `2ad077c7970b8ef09c3a1ba6ed5744e3c1ad4f68b56562c9f21f298de8e0c5be` |
+| Address | `0xad3C8BF5FCE573A9dB2f0c857e8c303aDFBB771f` |
+| Deployment tx | `0x3bde02c3690c03175a7601622c8b0cd82851a24031d5fcb40e48a223de7647ad` |
 | Network | GenLayer StudioNet, chain ID `61999` |
 | RPC | `https://studio.genlayer.com/api` |
 | Public schema | 30 methods (14 view, 16 write) |
+| Contract tests | 200 passed / 0 failed |
+| Frontend tests | 66 passed / 0 failed |
+| Frontend typecheck / lint / production build | PASS / PASS (1 warning) / PASS |
 
-Full independent verification: `docs/STAGE_9B_CANONICAL_VERIFICATION.md` and `docs/RELEASE_MANIFEST.md`.
+Current deployment/source verification and live lifecycle evidence: `docs/CANONICAL_DEPLOYMENT_VERIFICATION.md`. The earlier `0x234…F450` deployment is historical and superseded.
 
 ## Repository layout
 
 ```
 contracts/fairmod.py   — the GenLayer Intelligent Contract (frozen; canonical hash above)
 frontend/               — the production web frontend (Vite + React + TypeScript)
-test/                   — contract test suite (gltest.direct, 195 tests)
+test/                   — contract test suite (gltest.direct, 200 tests)
 diagnostics/            — minimal StudioNet reproduction probes
 docs/                   — full design, verification, and deployment history
 ```

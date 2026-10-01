@@ -37,7 +37,7 @@ A full application lifecycle was then exercised against this deployment: communi
 
 Full transaction-by-transaction evidence in [docs/STAGE_8C_HOSTED_FAIRMOD_DEPLOYMENT.md](STAGE_8C_HOSTED_FAIRMOD_DEPLOYMENT.md). This is a **temporary test deployment, not canonical** — no canonical wallet was used or accessed.
 
-## Stage 9B — CANONICAL deployment (2026-09-30)
+## Stage 9B — previous canonical deployment, superseded (2026-09-30)
 
 The user manually deployed the frozen FairMod contract via the GenLayer Studio website. This session independently re-verified it:
 
@@ -46,4 +46,10 @@ The user manually deployed the frozen FairMod contract via the GenLayer Studio w
 - **Protocol status**: FINALIZED — **GenVM execution result**: SUCCESS (Result Code: Return)
 - Schema (30 methods), code (byte-identical to `contracts/fairmod.py`), and a basic read call all independently reconfirmed by this session, plus cross-checked on the real Studio Explorer
 
-A small smoke test (community → constitution → case → evidence → freeze → real hosted adjudication → receipt) was then run against this canonical address using only the disposable `my-studionet-wallet` account. Full detail: [docs/STAGE_9B_CANONICAL_VERIFICATION.md](STAGE_9B_CANONICAL_VERIFICATION.md). **This is now the canonical FairMod deployment** — distinct from, and not to be confused with, the Stage 8C temporary address above. The user's canonical wallet was never accessed, used, or requested by Claude.
+A small smoke test was then run against that address using the disposable wallet. This address is now superseded by the deployment recorded below; see [docs/STAGE_9B_CANONICAL_VERIFICATION.md](STAGE_9B_CANONICAL_VERIFICATION.md) for its historical evidence.
+
+## Current canonical deployment and user-run lifecycle (2026-10-01)
+
+The hardened contract is deployed at `0xad3C8BF5FCE573A9dB2f0c857e8c303aDFBB771f` by transaction `0x3bde02c3690c03175a7601622c8b0cd82851a24031d5fcb40e48a223de7647ad`. Deployment status FINALIZED; Explorer showed GenVM SUCCESS. The current repository source SHA-256 is `2ad077c7970b8ef09c3a1ba6ed5744e3c1ad4f68b56562c9f21f298de8e0c5be`; live code matches after CRLF/LF normalization; schema is 30 methods (14 views, 16 writes).
+
+The user subsequently exercised the canonical app lifecycle: create community `c0`; add HARASSMENT rule; create case `c0#0`; add TEXT evidence `c0#0:e0`; freeze; adjudicate to FLAGGED/HARASSMENT; file and resolve a challenge as UPHOLD; run Fairness Mirror as CONSISTENT. Every listed operation reached FINALIZED / SUCCESS. A premature `finalize_case` attempt correctly failed because the 24-hour window was still open. Fresh read-only contract calls confirmed case and receipt state `FINAL`, verdict FLAGGED, challenge UPHOLD, final rule HARASSMENT, Mirror CONSISTENT, one finalized/flagged community case. Exact evidence: `docs/CANONICAL_DEPLOYMENT_VERIFICATION.md`.

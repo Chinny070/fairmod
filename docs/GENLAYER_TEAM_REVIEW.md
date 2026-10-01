@@ -1,5 +1,7 @@
 # FairMod — GenLayer Team Review
 
+> Historical investigation document. The `invalid_contract` cleanroom failures below predate a correction to the Depends-header/source-layout boundary. The clean probe and FairMod subsequently deployed successfully with the corrected layout; this sequence is evidence of association, not a claim about an independently confirmed underlying GenLayer root cause. Current deployment/source evidence is in `docs/CANONICAL_DEPLOYMENT_VERIFICATION.md`.
+
 ## Problem
 
 FairMod, and independent minimal control contracts, reach protocol `FINALIZED` on StudioNet 61999 but GenVM execution returns:
@@ -77,9 +79,9 @@ All commands below are read-only/local — none require a wallet or submit a tra
 ```bash
 # Contract-side (Python)
 pip install "genvm-linter==0.11.0" "genlayer-test==0.29.2"
-python -m pytest test/ -q                          # expect: 195 passed
+python -m pytest test/ -q                          # current verified: 200 passed
 genvm-lint check contracts/fairmod.py --json        # expect: ok:true, methods:30
-sha256sum contracts/fairmod.py                      # expect: 417cf3de5fef4e6e3a28c0d63510771f18e923dcf42a1f94295a1dc7d3c72d36
+sha256sum contracts/fairmod.py                      # current verified: 2ad077c7970b8ef09c3a1ba6ed5744e3c1ad4f68b56562c9f21f298de8e0c5be
 sha256sum diagnostics/studionet_61999_clean_probe.py  # expect: 493d0fc4a7ce8e64c54262cc21aea12d92ef8f730e29056f45c1ca40abfcaca8
 genvm-lint check diagnostics/studionet_61999_clean_probe.py --json  # expect: ok:true, methods:1
 
