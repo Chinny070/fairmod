@@ -1557,13 +1557,19 @@ class FairMod(gl.Contract):
 			return self._validate_candidate(raw, valid_rule_ids, valid_evidence_ids)
 
 		principle = (
-			'Two adjudication candidates are the SAME decision if they agree on the verdict '
-			'(ALLOWED, FLAGGED, or NEEDS_REVIEW) and, when FLAGGED, agree on the same set of '
-			'violated Rule IDs (order does not matter) and materially overlap on which evidence '
-			'was relied on. Differences in the exact wording of the explanation or material_facts '
-			'do NOT make them different. A verdict-only match is NOT sufficient when the violated '
-			'Rule IDs differ (FLAGGED/HARASSMENT is not equivalent to FLAGGED/SPAM), and ALLOWED is '
-			'never equivalent to FLAGGED or NEEDS_REVIEW regardless of any other similarity.'
+			'Two adjudication candidates are the SAME decision ONLY when every binding field agrees. '
+			'First, one valid candidate (ok=true) is never equivalent to an invalid candidate (ok=false); '
+			'two invalid candidates are equivalent only when they report the same reason. For valid '
+			'candidates, verdict must be exactly identical (ALLOWED, FLAGGED, or NEEDS_REVIEW); '
+			'violated_rule_ids must be the exact same set of Rule IDs (order does not matter); and '
+			'evidence_used must be the exact same set of evidence IDs (order does not matter). Partial '
+			'or material overlap of evidence_used is NOT sufficient. material_facts must describe the '
+			'same non-contradictory, decision-driving facts: a disagreement about the conduct, actor, '
+			'circumstances, or evidence relied on is NOT equivalent. Differences only in explanation '
+			'wording, or in non-contradictory phrasing/detail of the same material_facts, do NOT make '
+			'candidates different. A verdict-only match is NOT sufficient when Rule IDs or evidence IDs '
+			'differ (FLAGGED/HARASSMENT is not equivalent to FLAGGED/SPAM), and ALLOWED is never '
+			'equivalent to FLAGGED or NEEDS_REVIEW regardless of any other similarity.'
 		)
 
 		try:
